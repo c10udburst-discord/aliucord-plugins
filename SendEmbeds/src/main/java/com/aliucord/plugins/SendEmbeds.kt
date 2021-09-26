@@ -6,7 +6,6 @@ import com.discord.models.commands.ApplicationCommandOption
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 
-import com.aliucord.api.CommandsAPI.CommandResult
 import com.aliucord.Utils
 import com.aliucord.utils.ReflectUtils
 import com.aliucord.plugins.embedmodal.EmbedModal
@@ -24,7 +23,7 @@ class SendEmbeds : Plugin() {
 
             EmbedModal(ctx.getChannelId()).show(Utils.appActivity.supportFragmentManager, "Send Embed")
 
-            return@registerCommand CommandResult(null, null, false)
+            return@registerCommand null
         }
     }
 
