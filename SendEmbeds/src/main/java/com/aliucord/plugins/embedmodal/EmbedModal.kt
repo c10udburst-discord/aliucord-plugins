@@ -116,7 +116,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
     // }
 
     private fun sendNonBotEmbed(title: String, content: String, url: String, color: Int) {
-        val msg = "https://embed.rauf.workers.dev/?title=%s&description=%s&color=%h&redirect=%s".format(URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
+        val msg = "https://embed.rauf.workers.dev/?title=%s&description=%s&color=%06x&redirect=%s".format(URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),
@@ -136,9 +136,10 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
 
     private fun toColorInt(a: String): Int {
         try {
-            if (a.startsWith("#")) return a
+            if (a.matches(Regex("^#?[0-9A-Fa-f]{6}$"))) return a
                 .replace("#", "")
                 .toInt(16)
+            else if (a.matches(Regex("^[0-9]+$"))) return a.toInt(10)
         } catch(e:Throwable) {
             Utils.showToast(context, "Color parser error: %s".format(e.message))
             e.printStackTrace()
