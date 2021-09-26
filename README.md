@@ -3,3 +3,5 @@
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
 - [DeleteEmbeds](https://github.com/C10udburst/aliucord-plugins/raw/builds/DeleteEmbeds.zip) | 
   Delete embeds, just like on desktop clients
+- [SendEmbeds](https://github.com/C10udburst/aliucord-plugins/raw/builds/SendEmbeds.zip) |
+  Send embeds using an ui

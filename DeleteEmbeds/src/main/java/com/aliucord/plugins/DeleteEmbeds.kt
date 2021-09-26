@@ -51,7 +51,7 @@ class DeleteEmbeds : Plugin() {
                     val deleteEmbed = binding.a.findViewById<TextView>(deleteEmbedId).apply {
                         if (!message.hasEmbeds()) {
                             visibility = View.GONE
-                        } else if (!(callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canEdit) {
+                        } else if (!(callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canDelete) {
                             visibility = View.GONE
                         } else {
                             visibility = View.VISIBLE
