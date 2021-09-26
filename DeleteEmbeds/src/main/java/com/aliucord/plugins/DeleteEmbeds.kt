@@ -27,12 +27,10 @@ import com.aliucord.utils.GsonUtils
 import com.aliucord.Http
 import com.google.gson.JsonObject
 import com.discord.utilities.rest.RestAPI
+import com.discord.utilities.analytics.AnalyticSuperProperties
 
 val StoreAuthentication.authToken: String
     get() = this.`authToken$app_productionBetaRelease`
-
-// TODO: maybe dont hardcode this lol
-const val X_SUPER_PROPERTIES: String = "eyJvcyI6ImFuZHJvaWQiLCJicm93c2VyIjoiZGlzY29yZCBjbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJiZXRhIiwiY2xpZW50X3ZlcnNpb24iOiI4OS44Iiwib3NfdmVyc2lvbiI6IjExIiwib3NfYXJjaCI6ImFybTY0LXY4YSIsInN5c3RlbV9sb2NhbGUiOiJlbiIsImNsaWVudF9idWlsZF9udW1iZXIiOjg5MTA4LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
 
 
 @AliucordPlugin
@@ -110,7 +108,7 @@ class DeleteEmbeds : Plugin() {
         Http.Request("https://discord.com/api/v9/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
             .setHeader("Authorization", StoreStream.getAuthentication().authToken)
             .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-            .setHeader("X-Super-Properties", X_SUPER_PROPERTIES)
+            .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
             .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channelId, msgId))
             .setHeader("Accept", "*/*")
             .executeWithJson(GsonUtils.fromJson("{\"flags\":4}", JsonObject::class.java))
