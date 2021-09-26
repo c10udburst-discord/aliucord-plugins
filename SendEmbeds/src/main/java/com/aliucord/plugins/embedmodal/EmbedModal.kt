@@ -40,40 +40,54 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         val selfbotCheckbox = CheckBox(context).apply { text = "Self-bot mode" }
         linearLayout.addView(selfbotCheckbox)
 
-        val titleInput = AutoCompleteTextView(context).apply { setText("Title", TextView.BufferType.EDITABLE) }
+        val titleInput = AutoCompleteTextView(context).apply { 
+            setText("Title", TextView.BufferType.EDITABLE)
+            hint = "Title"
+        }
         linearLayout.addView(titleInput)
 
-        val contentInput = MultiAutoCompleteTextView(context).apply { setText("Content", TextView.BufferType.EDITABLE) }
+        val contentInput = MultiAutoCompleteTextView(context).apply { 
+            setText("Content", TextView.BufferType.EDITABLE)
+            hint = "Content"
+        }
         linearLayout.addView(contentInput)
 
-        val urlInput = AutoCompleteTextView(context).apply { setText("https://example.com", TextView.BufferType.EDITABLE) }
+        val urlInput = AutoCompleteTextView(context).apply { 
+            setText("https://example.com", TextView.BufferType.EDITABLE) 
+            hint = "Url"
+        }
         linearLayout.addView(urlInput)
+
+        val colorInput = EditText(context).apply { 
+            setText("#738ADB", TextView.BufferType.EDITABLE)
+            hint = "Color"
+        }
+        linearLayout.addView(colorInput)
 
         val sendBtn = Button(context).apply { 
             text = "Send"
-        }
-
-        sendBtn.setOnClickListener {
-            try {
-                if (selfbotCheckbox.isChecked) {
-                    Utils.threadPool.execute(object : Runnable {
-                        override fun run() {
-                            sendSelfbotEmbed(titleInput.text.toString(), contentInput.text.toString(), 5793266)
-                        }
-                    })
-                } else {
-                    Utils.threadPool.execute(object : Runnable {
-                        override fun run() {
-                            sendNonBotEmbed(titleInput.text.toString(), contentInput.text.toString(), 5793266)
-                        }
-                    })
+            setOnClickListener {
+                try {
+                    if (selfbotCheckbox.isChecked) {
+                        Utils.threadPool.execute(object : Runnable {
+                            override fun run() {
+                                sendSelfbotEmbed(titleInput.text.toString(), contentInput.text.toString(), urlInput.text.toString(), toColorInt(colorInput.text.toString()))
+                            }
+                        })
+                    } else {
+                        Utils.threadPool.execute(object : Runnable {
+                            override fun run() {
+                                sendNonBotEmbed(titleInput.text.toString(), contentInput.text.toString(), urlInput.text.toString(), toColorInt(colorInput.text.toString()))
+                            }
+                        })
+                    }
+                    dismiss()
+                } catch (e: Throwable) {
+                    Utils.showToast(context, "An error occured")
+                    e.printStackTrace()
                 }
-                dismiss()
-            } catch (e: Throwable) {
-                Utils.showToast(context, "An error occured")
-                e.printStackTrace()
+                
             }
-            
         }
         linearLayout.addView(sendBtn)
     }
@@ -104,7 +118,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
     }
 
     private fun sendNonBotEmbed(title: String, content: String, url: String, color: Int) {
-        val msg = "https://embed.rauf.workers.dev/?title=%s&description=%s&color=%h&redirect=".format(title, content, color, url)
+        val msg = "https://embed.rauf.workers.dev/?title=%s&description=%s&color=%h&redirect=%s".format(title, content, color, url)
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),
@@ -120,5 +134,17 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
             )
         )
         RestAPI.api.sendMessage(channelId, message).subscribe(createActionSubscriber({ }))
+    }
+
+    private fun toColorInt(a: String): Int {
+        try {
+            if (a.startsWith("#")) return a
+                .replace("#", "")
+                .toInt(16)
+        } catch(e:Throwable) {
+            Utils.showToast(context, "Color parser error: %s".format(e.message))
+            e.printStackTrace()
+        }
+        return 0
     }
 }
