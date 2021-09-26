@@ -1,2 +1,2 @@
-version = "1.0.1"
-description = "Send JSON embed messages with /embed."
+version = "1.0.2"
+description = "Send embed messages with /embed."
