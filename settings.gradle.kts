@@ -1,5 +1,5 @@
-// include(":<name>")
-// project(":<name>").projectDir = File("./<name>")
+include(":SendEmbeds")
+project(":SendEmbeds").projectDir = File("./SendEmbeds")
 
 
 rootProject.name = "AliucordPlugins"
