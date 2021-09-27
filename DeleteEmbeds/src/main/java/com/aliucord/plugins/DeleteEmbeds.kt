@@ -19,8 +19,8 @@ import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
+import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
-import com.discord.stores.StoreAuthentication
 import com.aliucord.fragments.ConfirmDialog
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
@@ -28,10 +28,6 @@ import com.aliucord.Http
 import com.google.gson.JsonObject
 import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.analytics.AnalyticSuperProperties
-
-val StoreAuthentication.authToken: String
-    get() = this.`authToken$app_productionBetaRelease`
-
 
 @AliucordPlugin
 class DeleteEmbeds : Plugin() {
@@ -106,7 +102,7 @@ class DeleteEmbeds : Plugin() {
 
     fun deleteEmbed(channelId: Long, msgId: Long) {
         Http.Request("https://discord.com/api/v9/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
-            .setHeader("Authorization", StoreStream.getAuthentication().authToken)
+            .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
             .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
             .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
             .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channelId, msgId))

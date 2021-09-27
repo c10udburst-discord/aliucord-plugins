@@ -2,15 +2,17 @@ package com.aliucord.plugins.embedmodal
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.View
+import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.AutoCompleteTextView
 import android.widget.MultiAutoCompleteTextView
-import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Button
 import com.aliucord.widgets.BottomSheet
+import com.discord.utilities.color.ColorCompat
+import com.lytefast.flexinput.R
+
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 
@@ -33,21 +35,35 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-
         val context = view.context
+        this.setPadding(24)
+
+        val authorInput = AutoCompleteTextView(context).apply { 
+            hint = "Author"
+            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
+            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
+        }
+        linearLayout.addView(authorInput)
 
         val titleInput = AutoCompleteTextView(context).apply { 
             hint = "Title"
+            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
+            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
         }
         linearLayout.addView(titleInput)
 
         val contentInput = MultiAutoCompleteTextView(context).apply { 
             hint = "Content"
+            minimumHeight = 120
+            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
+            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
         }
         linearLayout.addView(contentInput)
 
         val urlInput = AutoCompleteTextView(context).apply { 
             hint = "Url"
+            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
+            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
         }
         linearLayout.addView(urlInput)
 
@@ -63,7 +79,13 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                 try {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
-                            sendNonBotEmbed(titleInput.text.toString(), contentInput.text.toString(), urlInput.text.toString(), toColorInt(colorInput.text.toString()))
+                            sendNonBotEmbed(
+                                authorInput.text.toString(), 
+                                titleInput.text.toString(), 
+                                contentInput.text.toString(), 
+                                urlInput.text.toString(), 
+                                toColorInt(colorInput.text.toString())
+                            )
                         }
                     })
                     dismiss()
@@ -77,8 +99,8 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         linearLayout.addView(sendBtn)
     }
 
-    private fun sendNonBotEmbed(title: String, content: String, url: String, color: Int) {
-        val msg = "https://embed.rauf.workers.dev/?title=%s&description=%s&color=%06x&redirect=%s".format(URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
+    private fun sendNonBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
+        val msg = "https://embed.rauf.workers.dev/?author=%s&title=%s&description=%s&color=%06x&redirect=%s".format(URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),
