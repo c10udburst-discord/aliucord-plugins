@@ -3,13 +3,13 @@ package com.aliucord.plugins.embedmodal
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.AutoCompleteTextView
-import android.widget.MultiAutoCompleteTextView
-import android.widget.TextView
-import android.widget.Button
 import com.aliucord.widgets.BottomSheet
+import com.aliucord.views.TextInput
+import androidx.appcompat.widget.Toolbar
+import android.view.inputmethod.EditorInfo
+import com.aliucord.views.Button
+import com.aliucord.utils.DimenUtils
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
 
@@ -29,49 +29,73 @@ import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
 import java.net.URLEncoder
 
+fun View.setMarginEnd(
+    value: Int
+) {
+    val params = Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT)
+    params.gravity = Gravity.END
+    params.bottomMargin = value
+    this.layoutParams = params
+}
 
 class EmbedModal(val channelId: Long) : BottomSheet() {
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-        val context = view.context
-        this.setPadding(24)
+        val context = requireContext()
+        val padding = DimenUtils.getDefaultPadding()
+        val p = padding / 2;
+        this.setPadding(padding)
 
-        val authorInput = AutoCompleteTextView(context).apply { 
+        val authorInput = TextInput(context).apply { 
             hint = "Author"
-            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
-            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
+            editText?.apply { 
+                inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or EditorInfo.TYPE_CLASS_TEXT)
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            setMarginEnd(p)
         }
-        linearLayout.addView(authorInput)
-
-        val titleInput = AutoCompleteTextView(context).apply { 
+        
+        val titleInput = TextInput(context).apply { 
             hint = "Title"
-            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
-            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
+            editText?.apply { 
+                inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or EditorInfo.TYPE_CLASS_TEXT)
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            setMarginEnd(p)
         }
-        linearLayout.addView(titleInput)
 
-        val contentInput = MultiAutoCompleteTextView(context).apply { 
+        val contentInput = TextInput(context).apply { 
             hint = "Content"
-            minimumHeight = 120
-            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
-            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
+            editText?.apply { 
+                maxLines = Int.MAX_VALUE
+                inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or 
+                    EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE or 
+                    EditorInfo.TYPE_CLASS_TEXT)
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                setHorizontallyScrolling(false)
+            }
+            setMarginEnd(p)
         }
-        linearLayout.addView(contentInput)
-
-        val urlInput = AutoCompleteTextView(context).apply { 
+        
+        val urlInput = TextInput(context).apply { 
             hint = "Url"
-            setTextColor(ColorCompat.getThemedColor(context, R.b.colorTextNormal))
-            setHintTextColor(ColorCompat.getThemedColor(context, R.b.colorTextMuted))
+            editText?.apply {
+                inputType = (EditorInfo.TYPE_TEXT_VARIATION_URI or EditorInfo.TYPE_CLASS_TEXT)
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            setMarginEnd(p)
         }
-        linearLayout.addView(urlInput)
-
-        val colorInput = EditText(context).apply { 
-            setText("#738ADB", TextView.BufferType.EDITABLE)
+        
+        val colorInput = TextInput(context).apply { 
+            editText?.setText("#738ADB")
             hint = "Color"
+            editText?.apply { 
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            setMarginEnd(p)
         }
-        linearLayout.addView(colorInput)
 
         val sendBtn = Button(context).apply { 
             text = "Send"
@@ -80,11 +104,11 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
                             sendNonBotEmbed(
-                                authorInput.text.toString(), 
-                                titleInput.text.toString(), 
-                                contentInput.text.toString(), 
-                                urlInput.text.toString(), 
-                                toColorInt(colorInput.text.toString())
+                                authorInput.editText?.text.toString(), 
+                                titleInput.editText?.text.toString(), 
+                                contentInput.editText?.text.toString(), 
+                                urlInput.editText?.text.toString(), 
+                                toColorInt(colorInput.editText?.text.toString())
                             )
                         }
                     })
@@ -93,10 +117,15 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                     Utils.showToast(context, "An error occured")
                     e.printStackTrace()
                 }
-                
             }
         }
-        linearLayout.addView(sendBtn)
+
+        addView(authorInput)
+        addView(titleInput)
+        addView(contentInput)
+        addView(urlInput)
+        addView(colorInput)
+        addView(sendBtn)
     }
 
     private fun sendNonBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
@@ -130,4 +159,5 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         }
         return 0
     }
+
 }
