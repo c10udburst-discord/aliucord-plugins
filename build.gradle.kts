@@ -33,8 +33,8 @@ subprojects {
 
     aliucord {
         author("Cloudburst", 295186738085756929L)
-        updateUrl.set("https://raw.githubusercontent.com/C10udburst/aliucord-plugins/builds/updater.json")
-        buildUrl.set("https://raw.githubusercontent.com/C10udburst/aliucord-plugins/builds/%s.zip")
+        updateUrl.set("https://raw.githubusercontent.com/C10udburst/aliucord-plugins/selfbotbuilds/updater.json")
+        buildUrl.set("https://raw.githubusercontent.com/C10udburst/aliucord-plugins/selfbotbuilds/%s.zip")
     }
 
     android {
