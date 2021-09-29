@@ -129,8 +129,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                 setOnClickListener {
                     val modeSelector = ModeSelector(listOf(
                         "embed.rauf.workers.dev",
-                        "embed.rauf.wtf",
-                        "embeds.vendicated.dev"
+                        "embed.rauf.wtf"
                     ), {mode -> 
                         this.setText(mode)
                     })
@@ -148,16 +147,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                         override fun run() {
                             val mode = modeInput.editText?.text.toString()
 
-                            if (mode == "embeds.vendicated.dev") {
-                                sendNonBotEmbed(
-                                    "https://embeds.vendicated.dev/embed",
-                                    authorInput.editText?.text.toString(), 
-                                    titleInput.editText?.text.toString(), 
-                                    contentInput.editText?.text.toString(), 
-                                    urlInput.editText?.text.toString(), 
-                                    toColorInt(colorInput.editText?.text.toString())
-                                )
-                            } else {
+                            
                                 sendNonBotEmbed(
                                     "https://"+mode+"/",
                                     authorInput.editText?.text.toString(), 
@@ -166,7 +156,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                                     urlInput.editText?.text.toString(), 
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
-                            }
+                            
 
                             
                         }
