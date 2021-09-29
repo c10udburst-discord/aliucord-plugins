@@ -1,17 +1,21 @@
-package com.aliucord.plugins.embedmodal
+package com.aliucord.plugins.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
 import com.aliucord.widgets.BottomSheet
+import com.aliucord.widgets.LinearLayout
 import com.aliucord.views.TextInput
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.ColorUtils
 import android.view.inputmethod.EditorInfo
 import com.aliucord.views.Button
 import com.aliucord.utils.DimenUtils
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
+import com.discord.utilities.colors.ColorPickerUtils
+import com.aliucord.plugins.ui.ModeSelector
 
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
@@ -27,6 +31,7 @@ import com.discord.utilities.time.ClockFactory
 import com.discord.restapi.RestAPIParams
 import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
+import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import java.net.URLEncoder
 
 fun View.setMarginEnd(
@@ -43,14 +48,15 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-        val context = requireContext()
+        val context = view.context
         val padding = DimenUtils.getDefaultPadding()
         val p = padding / 2;
         this.setPadding(padding)
 
         val authorInput = TextInput(context).apply { 
             hint = "Author"
-            editText?.apply { 
+            editText?.apply {
+                setText(StoreStream.getUsers().me.username)
                 inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or EditorInfo.TYPE_CLASS_TEXT)
                 imeOptions = EditorInfo.IME_ACTION_NEXT
             }
@@ -92,7 +98,44 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
             editText?.setText("#738ADB")
             hint = "Color"
             editText?.apply { 
-                imeOptions = EditorInfo.IME_ACTION_NEXT
+                inputType = EditorInfo.TYPE_NULL
+                setOnClickListener {
+                    val builder = ColorPickerUtils.INSTANCE.buildColorPickerDialog(
+                        context, 
+                        Utils.getResId("color_picker_title", "string"), 
+                        ColorCompat.getThemedColor(context, R.b.colorAccent)
+                    )
+                    builder.j = object: c.k.a.a.f { // color picker listener i guess
+                        override fun onColorReset(i: Int) { }
+
+                        override fun onColorSelected(i: Int, i2: Int) {
+                            editText?.setText("#%06X".format(i2 and 0x00FFFFFF)) // remove alpha component
+                        }
+
+                        override fun onDialogDismissed(i: Int) { }
+                    }
+                    builder.show(parentFragmentManager, "COLOR_PICKER")
+                }
+                setClickable(true)
+            }
+            setMarginEnd(p)
+        }
+
+        val modeInput = TextInput(context).apply { 
+            editText?.setText("embed.rauf.workers.dev")
+            hint = "Mode"
+            editText?.apply { 
+                inputType = EditorInfo.TYPE_NULL
+                setOnClickListener {
+                    val modeSelector = ModeSelector(listOf(
+                        "embed.rauf.workers.dev",
+                        "embed.rauf.wtf",
+                        "embeds.vendicated.dev"
+                    ), {mode -> 
+                        this.setText(mode)
+                    })
+                    modeSelector.show(parentFragmentManager, "Embed Mode")
+                }
             }
             setMarginEnd(p)
         }
@@ -103,13 +146,29 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                 try {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
-                            sendNonBotEmbed(
-                                authorInput.editText?.text.toString(), 
-                                titleInput.editText?.text.toString(), 
-                                contentInput.editText?.text.toString(), 
-                                urlInput.editText?.text.toString(), 
-                                toColorInt(colorInput.editText?.text.toString())
-                            )
+                            val mode = modeInput.editText?.text.toString()
+
+                            if (mode == "embeds.vendicated.dev") {
+                                sendNonBotEmbed(
+                                    "https://embeds.vendicated.dev/embed",
+                                    authorInput.editText?.text.toString(), 
+                                    titleInput.editText?.text.toString(), 
+                                    contentInput.editText?.text.toString(), 
+                                    urlInput.editText?.text.toString(), 
+                                    toColorInt(colorInput.editText?.text.toString())
+                                )
+                            } else {
+                                sendNonBotEmbed(
+                                    "https://"+mode+"/",
+                                    authorInput.editText?.text.toString(), 
+                                    titleInput.editText?.text.toString(), 
+                                    contentInput.editText?.text.toString(), 
+                                    urlInput.editText?.text.toString(), 
+                                    toColorInt(colorInput.editText?.text.toString())
+                                )
+                            }
+
+                            
                         }
                     })
                     dismiss()
@@ -125,11 +184,12 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         addView(contentInput)
         addView(urlInput)
         addView(colorInput)
+        addView(modeInput)
         addView(sendBtn)
     }
 
-    private fun sendNonBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
-        val msg = "https://embed.rauf.workers.dev/?author=%s&title=%s&description=%s&color=%06x&redirect=%s".format(URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
+    private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, color: Int) {
+        val msg = "[](%s?author=%s&title=%s&description=%s&color=%06x&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),
@@ -149,10 +209,9 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
 
     private fun toColorInt(a: String): Int {
         try {
-            if (a.matches(Regex("^#?[0-9A-Fa-f]{6}$"))) return a
+            return a
                 .replace("#", "")
                 .toInt(16)
-            else if (a.matches(Regex("^[0-9]+$"))) return a.toInt(10)
         } catch(e:Throwable) {
             Utils.showToast(context, "Color parser error: %s".format(e.message))
             e.printStackTrace()

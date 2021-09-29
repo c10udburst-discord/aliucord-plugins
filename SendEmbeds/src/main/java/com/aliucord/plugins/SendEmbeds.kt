@@ -8,7 +8,7 @@ import com.aliucord.entities.Plugin
 
 import com.aliucord.Utils
 import com.aliucord.utils.ReflectUtils
-import com.aliucord.plugins.embedmodal.EmbedModal
+import com.aliucord.plugins.ui.EmbedModal
 
 @AliucordPlugin
 class SendEmbeds : Plugin() {
@@ -20,9 +20,7 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-
             EmbedModal(ctx.getChannelId()).show(Utils.appActivity.supportFragmentManager, "Send Embed")
-
             return@registerCommand null
         }
     }
