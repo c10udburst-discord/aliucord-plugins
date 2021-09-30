@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - selfbot
     paths-ignore:
       - '*.md'
 
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout builds
         uses: actions/checkout@master
         with:
-          ref: "builds"
+          ref: "selfbotbuilds"
           path: "builds"
 
       - name: Checkout Aliucord

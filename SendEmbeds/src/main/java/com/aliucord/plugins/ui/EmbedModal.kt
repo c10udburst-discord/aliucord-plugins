@@ -17,6 +17,11 @@ import com.lytefast.flexinput.R
 import com.discord.utilities.colors.ColorPickerUtils
 import com.aliucord.plugins.ui.ModeSelector
 
+import com.aliucord.plugins.utils.Author
+import com.aliucord.plugins.utils.Embed
+import com.aliucord.plugins.utils.Message
+import com.aliucord.Http
+
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 
@@ -130,6 +135,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                     val modeSelector = ModeSelector(listOf(
                         "embed.rauf.workers.dev",
                         "embed.rauf.wtf"
+                        "selfbot"
                     ), {mode -> 
                         this.setText(mode)
                     })
@@ -146,8 +152,15 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
                             val mode = modeInput.editText?.text.toString()
-
-                            
+                            if (mode == "selfbot") {
+                                sendSelfBotEmbed(
+                                    authorInput.editText?.text.toString(), 
+                                    titleInput.editText?.text.toString(), 
+                                    contentInput.editText?.text.toString(), 
+                                    urlInput.editText?.text.toString(), 
+                                    toColorInt(colorInput.editText?.text.toString())
+                                )
+                            } else {
                                 sendNonBotEmbed(
                                     "https://"+mode+"/",
                                     authorInput.editText?.text.toString(), 
@@ -156,9 +169,6 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                                     urlInput.editText?.text.toString(), 
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
-                            
-
-                            
                         }
                     })
                     dismiss()
@@ -176,6 +186,32 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         addView(colorInput)
         addView(modeInput)
         addView(sendBtn)
+    }
+
+    private fun sendSelfBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
+        try {
+            val msg = Message(
+                null,
+                false,
+                NonceGenerator.computeNonce(ClockFactory.get()).toString(),
+                Embed(
+                    Author(author),
+                    title, 
+                    content,
+                    url,
+                    color
+                )
+            )
+            Http.Request("https://discord.com/api/v9/channels/%d/messages".format(channelId), "POST")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .executeWithJson(msg)
+            .text()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 
     private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, color: Int) {
