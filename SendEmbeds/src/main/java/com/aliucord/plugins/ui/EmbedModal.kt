@@ -134,7 +134,7 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                 setOnClickListener {
                     val modeSelector = ModeSelector(listOf(
                         "embed.rauf.workers.dev",
-                        "embed.rauf.wtf"
+                        "embed.rauf.wtf",
                         "selfbot"
                     ), {mode -> 
                         this.setText(mode)
