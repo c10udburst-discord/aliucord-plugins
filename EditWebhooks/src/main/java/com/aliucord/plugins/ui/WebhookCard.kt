@@ -66,8 +66,8 @@ class WebhookCard(ctx: Context, webhook: Webhook, fragmentManager: FragmentManag
                     text = "Delete Webhook"
                     setOnClickListener {
                         val coDialog = ConfirmDialog()
-                                        .setTitle("Delete Embed")
-                                        .setDescription("Do you want to delete this embed?")
+                                        .setTitle("Delete webhook")
+                                        .setDescription("Do you want to delete this webhook?")
                         coDialog.setOnOkListener {
                             coDialog.dismiss()
                             Utils.threadPool.execute { deleteWebhook(webhook.id) }
