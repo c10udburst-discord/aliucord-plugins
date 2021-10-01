@@ -52,13 +52,13 @@ class SendEmbeds : Plugin() {
         with(FlexInputFragment::class.java, { 
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame -> 
                 try {
-                    if (settings.getBool("SendEmbeds_ButtonVisible", true)) {
+                    if (settings.getBool("SendEmbeds_ButtonVisible", false)) {
                         val view = ((callFrame.args[0] as LinearLayout).getChildAt(1) as RelativeLayout).getChildAt(0) as LinearLayout
                     
                         val btn = AppCompatImageButton(ContextThemeWrapper(view.context, R.h.UiKit_ImageView_Clickable), null, 0).apply { 
                             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
                             setImageDrawable(icon)
-                            setBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorBackgroundTertiary))
+                            setBackgroundColor(0)
                             setOnClickListener {
                                 val channelId = StoreStream.getChannelsSelected().id
                                 EmbedModal(channelId, settings).show(Utils.appActivity.supportFragmentManager, "SendEmbedModal")

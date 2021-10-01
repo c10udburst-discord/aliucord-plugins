@@ -34,7 +34,7 @@ class SendEmbedsSettings(private val plugin: SendEmbeds) : AppBottomSheet() {
 
         layout.addView(Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Show button", null).apply {
             val key = "SendEmbeds_ButtonVisible"
-            isChecked = plugin.settings.getBool(key, true)
+            isChecked = plugin.settings.getBool(key, false)
             setOnCheckedListener {
                 plugin.settings.setBool(key, it)
             }
