@@ -28,6 +28,7 @@ import com.discord.api.permission.Permission
 
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
+import com.discord.stores.StorePermissions
 import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.analytics.AnalyticSuperProperties
 
@@ -144,7 +145,8 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                         modes.add("selfbot")
                     }
 
-                    if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, StoreStream.getChannels().getChannel(channelId).f())) {
+                    val perms = StoreStream.getPermissions()
+                    if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
                         modes.add("webhook")
                     }
                     
