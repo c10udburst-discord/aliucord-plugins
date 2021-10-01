@@ -20,6 +20,12 @@ import com.aliucord.plugins.ui.ModeSelector
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 
+import com.aliucord.plugins.utils.*
+import com.aliucord.Http
+
+import com.discord.utilities.permissions.PermissionUtils
+import com.discord.api.permission.Permission
+
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
 import com.discord.utilities.rest.RestAPI
@@ -31,6 +37,7 @@ import com.discord.utilities.time.ClockFactory
 import com.discord.restapi.RestAPIParams
 import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
+import com.aliucord.api.SettingsAPI
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import java.net.URLEncoder
 
@@ -43,7 +50,7 @@ fun View.setMarginEnd(
     this.layoutParams = params
 }
 
-class EmbedModal(val channelId: Long) : BottomSheet() {
+class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet() {
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
@@ -127,10 +134,21 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
             editText?.apply { 
                 inputType = EditorInfo.TYPE_NULL
                 setOnClickListener {
-                    val modeSelector = ModeSelector(listOf(
+                    val modes = arrayListOf(
                         "embed.rauf.workers.dev",
-                        "embed.rauf.wtf"
-                    ), {mode -> 
+                        "embed.rauf.wtf",
+                        "rauf.wtf/embed"
+                    )
+                    
+                    if (settings.getBool("SendEmbeds_SelfBotMode", false)) {
+                        modes.add("selfbot")
+                    }
+
+                    if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, StoreStream.getChannels().getChannel(channelId).f())) {
+                        modes.add("webhook")
+                    }
+                    
+                    val modeSelector = ModeSelector(modes, {mode -> 
                         this.setText(mode)
                     })
                     modeSelector.show(parentFragmentManager, "Embed Mode")
@@ -147,18 +165,32 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
                         override fun run() {
                             val mode = modeInput.editText?.text.toString()
 
-                            
-                                sendNonBotEmbed(
-                                    "https://"+mode+"/",
+                            if (mode == "webhook") {
+                                sendWebhookEmbed(
                                     authorInput.editText?.text.toString(), 
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
                                     urlInput.editText?.text.toString(), 
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
-                            
-
-                            
+                            } else if (mode == "selfbot") {
+                                sendSelfBotEmbed(
+                                    authorInput.editText?.text.toString(), 
+                                    titleInput.editText?.text.toString(), 
+                                    contentInput.editText?.text.toString(), 
+                                    urlInput.editText?.text.toString(), 
+                                    toColorInt(colorInput.editText?.text.toString())
+                                )
+                            } else {
+                                sendNonBotEmbed(
+                                    mode,
+                                    authorInput.editText?.text.toString(), 
+                                    titleInput.editText?.text.toString(), 
+                                    contentInput.editText?.text.toString(), 
+                                    urlInput.editText?.text.toString(), 
+                                    toColorInt(colorInput.editText?.text.toString())
+                                )
+                            }
                         }
                     })
                     dismiss()
@@ -178,8 +210,60 @@ class EmbedModal(val channelId: Long) : BottomSheet() {
         addView(sendBtn)
     }
 
+    private fun sendWebhookEmbed(author: String, title: String, content: String, url: String, color: Int)  {
+        val list = Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .execute()
+                .json(Array<Webhook>::class.java)
+        if (list.size < 1) return
+
+        Http.Request(list.get(0).url, "POST")
+            .executeWithJson(WebhookMessage(
+                null, 
+                listOf(
+                    Embed(
+                        Author(author),
+                        title, 
+                        content,
+                        url,
+                        color
+                    )
+                )
+            ))
+    }
+
+    // this is hidden mkay?
+    private fun sendSelfBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
+        try {
+            val msg = Message(
+                null,
+                false,
+                NonceGenerator.computeNonce(ClockFactory.get()).toString(),
+                Embed(
+                    Author(author),
+                    title, 
+                    content,
+                    url,
+                    color
+                )
+            )
+            Http.Request("https://discord.com/api/v9/channels/%d/messages".format(channelId), "POST")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .executeWithJson(msg)
+            .text()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+    }
+
     private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, color: Int) {
-        val msg = "[](%s?author=%s&title=%s&description=%s&color=%06x&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
+        val msg = "[](https://%s/?author=%s&title=%s&description=%s&color=%06x&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),

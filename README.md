@@ -6,4 +6,4 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 - [EditWebhooks](https://github.com/C10udburst/aliucord-plugins/raw/builds/EditWebhooks.zip) |
   View, delete and create webhooks
 - [SendEmbeds](https://github.com/C10udburst/aliucord-plugins/raw/builds/SendEmbeds.zip) |
-  Adds a `/embed` command which opens an ui which can be used to send embeds (using links).
+  Adds a `/embed` command and a button  which opens an ui which can be used to send embeds (using links and webhooks).
