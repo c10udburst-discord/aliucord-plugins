@@ -85,8 +85,6 @@ class WebhookList(val channel: Channel) : SettingsPage() {
 
                 addView(Divider(context))
                 addView(addButton)
-
-                parentFragmentManager
             }
         }
     }
