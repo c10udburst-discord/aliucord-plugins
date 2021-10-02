@@ -28,6 +28,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ContextThemeWrapper
 import com.discord.utilities.color.ColorCompat
 import com.aliucord.plugins.ui.SendEmbedsSettings
+import com.discord.utilities.time.ClockFactory
 
 @AliucordPlugin
 class SendEmbeds : Plugin() {
@@ -45,7 +46,7 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-            EmbedModal(ctx.getChannelId(), settings).show(Utils.appActivity.supportFragmentManager, "SendEmbedModal")
+            EmbedModal(ctx.getChannelId(), settings).show(Utils.appActivity.supportFragmentManager, ClockFactory.get().currentTimeMillis().toString())
             return@registerCommand null
         }
 
@@ -61,7 +62,7 @@ class SendEmbeds : Plugin() {
                             setBackgroundColor(0)
                             setOnClickListener {
                                 val channelId = StoreStream.getChannelsSelected().id
-                                EmbedModal(channelId, settings).show(Utils.appActivity.supportFragmentManager, "SendEmbedModal")
+                                EmbedModal(channelId, settings).show(Utils.appActivity.supportFragmentManager, ClockFactory.get().currentTimeMillis().toString())
                             }
                             setPadding(0, 0, 8, 0)
                             setClickable(true)

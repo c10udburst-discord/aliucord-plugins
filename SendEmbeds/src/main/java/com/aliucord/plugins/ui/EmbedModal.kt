@@ -129,6 +129,15 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
             setMarginEnd(p)
         }
 
+        val imageInput = TextInput(context).apply { 
+            hint = "Image Url"
+            editText?.apply {
+                inputType = (EditorInfo.TYPE_TEXT_VARIATION_URI or EditorInfo.TYPE_CLASS_TEXT)
+                imeOptions = EditorInfo.IME_ACTION_NEXT
+            }
+            setMarginEnd(p)
+        }
+
         val modeInput = TextInput(context).apply { 
             editText?.setText("embed.rauf.workers.dev")
             hint = "Mode"
@@ -173,6 +182,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
                                     urlInput.editText?.text.toString(), 
+                                    imageInput.editText?.text.toString(),
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
                             } else if (mode == "selfbot") {
@@ -181,6 +191,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
                                     urlInput.editText?.text.toString(), 
+                                    imageInput.editText?.text.toString(),
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
                             } else {
@@ -190,6 +201,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
                                     urlInput.editText?.text.toString(), 
+                                    imageInput.editText?.text.toString(),
                                     toColorInt(colorInput.editText?.text.toString())
                                 )
                             }
@@ -207,12 +219,13 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
         addView(titleInput)
         addView(contentInput)
         addView(urlInput)
+        addView(imageInput)
         addView(colorInput)
         addView(modeInput)
         addView(sendBtn)
     }
 
-    private fun sendWebhookEmbed(author: String, title: String, content: String, url: String, color: Int)  {
+    private fun sendWebhookEmbed(author: String, title: String, content: String, url: String, imageUrl: String, color: Int)  {
         val list = Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
                 .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
                 .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
@@ -231,6 +244,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                         title, 
                         content,
                         url,
+                        EmbedImage(imageUrl),
                         color
                     )
                 )
@@ -238,7 +252,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
     }
 
     // this is hidden mkay?
-    private fun sendSelfBotEmbed(author: String, title: String, content: String, url: String, color: Int) {
+    private fun sendSelfBotEmbed(author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
         try {
             val msg = Message(
                 null,
@@ -249,6 +263,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                     title, 
                     content,
                     url,
+                    EmbedImage(imageUrl),
                     color
                 )
             )
@@ -264,8 +279,8 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
         }
     }
 
-    private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, color: Int) {
-        val msg = "[](https://%s/?author=%s&title=%s&description=%s&color=%06x&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(url, "utf-8"))
+    private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
+        val msg = "[](https://%s/?author=%s&title=%s&description=%s&color=%06x&image=%s&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(imageUrl, "utf-8"), URLEncoder.encode(url, "utf-8"))
         val message = RestAPIParams.Message(
             msg,
             NonceGenerator.computeNonce(ClockFactory.get()).toString(),
