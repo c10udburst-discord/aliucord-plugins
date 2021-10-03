@@ -144,25 +144,49 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
             editText?.apply { 
                 inputType = EditorInfo.TYPE_NULL
                 setOnClickListener {
-                    val modes = arrayListOf(
-                        "embed.rauf.workers.dev",
-                        "embed.rauf.wtf",
-                        "rauf.wtf/embed"
-                    )
-                    
-                    if (settings.getBool("SendEmbeds_SelfBotMode", false)) {
-                        modes.add("selfbot")
-                    }
-
-                    val perms = StoreStream.getPermissions()
-                    if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
-                        modes.add("webhook")
-                    }
-                    
-                    val modeSelector = ModeSelector(modes, {mode -> 
-                        this.setText(mode)
+                    Utils.threadPool.execute({
+                        val webhooks = HashMap<String, Webhook>()
+                        val perms = StoreStream.getPermissions()
+                        if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
+                            for(hook in getWebhooks()) {
+                                if (hook.token == null) break
+                                var name = hook.name
+                                if (name == null) {
+                                    name = hook.token
+                                }
+                                while (webhooks.containsKey(name)) {
+                                    name += "."
+                                }
+                                webhooks.put(name, hook)
+                            }
+                        }
+                        
+                        val modes = arrayListOf(
+                            "embed.rauf.workers.dev",
+                            "embed.rauf.wtf",
+                            "rauf.wtf/embed"
+                        )
+                        
+                        if (settings.getBool("SendEmbeds_SelfBotMode", false)) {
+                            modes.add("selfbot")
+                        }
+    
+                        webhooks.keys.forEach {
+                            modes.add("webhook: %s".format(it))
+                        }
+                        
+                        val modeSelector = ModeSelector(modes, {mode -> 
+                            if (mode.startsWith("webhook: ")) {
+                                val hook = webhooks.get(mode.drop(9))
+                                this.setText("webhooks/%s/%s".format(hook?.id, hook?.token))
+                            } else {
+                                this.setText(mode)
+                            }
+                        })
+                        modeSelector.show(parentFragmentManager, "Embed Mode")
+                        
                     })
-                    modeSelector.show(parentFragmentManager, "Embed Mode")
+
                 }
             }
             setMarginEnd(p)
@@ -176,8 +200,9 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                         override fun run() {
                             val mode = modeInput.editText?.text.toString()
 
-                            if (mode == "webhook") {
+                            if (mode.startsWith("webhooks/")) {
                                 sendWebhookEmbed(
+                                    mode,
                                     authorInput.editText?.text.toString(), 
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
@@ -225,17 +250,19 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
         addView(sendBtn)
     }
 
-    private fun sendWebhookEmbed(author: String, title: String, content: String, url: String, imageUrl: String, color: Int)  {
-        val list = Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .execute()
-                .json(Array<Webhook>::class.java)
-        if (list.size < 1) return
+    private fun getWebhooks(): Array<Webhook> {
+        return Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
+        .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+        .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+        .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+        .setHeader("Accept", "*/*")
+        .execute()
+        .json(Array<Webhook>::class.java)
+    }
 
-        Http.Request(list.get(0).url, "POST")
+    private fun sendWebhookEmbed(webhook: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int)  {
+
+        Http.Request("https://discord.com/api/%s".format(webhook), "POST")
             .executeWithJson(WebhookMessage(
                 null, 
                 listOf(

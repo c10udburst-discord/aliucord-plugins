@@ -26,9 +26,10 @@ import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatImageButton
 import android.view.ViewGroup.LayoutParams
 import android.view.ContextThemeWrapper
+import android.app.Activity
 import com.discord.utilities.color.ColorCompat
 import com.aliucord.plugins.ui.SendEmbedsSettings
-import com.discord.utilities.time.ClockFactory
+import com.aliucord.fragments.AppFragmentProxy
 
 @AliucordPlugin
 class SendEmbeds : Plugin() {
@@ -46,7 +47,7 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-            EmbedModal(ctx.getChannelId(), settings).show(Utils.appActivity.supportFragmentManager, ClockFactory.get().currentTimeMillis().toString())
+            EmbedModal(ctx.getChannelId(), settings).show(Utils.appActivity.supportFragmentManager, "SendEmbeds")
             return@registerCommand null
         }
 
@@ -54,7 +55,9 @@ class SendEmbeds : Plugin() {
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame -> 
                 try {
                     if (settings.getBool("SendEmbeds_ButtonVisible", false)) {
+                        
                         val view = ((callFrame.args[0] as LinearLayout).getChildAt(1) as RelativeLayout).getChildAt(0) as LinearLayout
+                        val fragmentManager = (callFrame.thisObject as FlexInputFragment).parentFragmentManager
                     
                         val btn = AppCompatImageButton(ContextThemeWrapper(view.context, R.h.UiKit_ImageView_Clickable), null, 0).apply { 
                             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
@@ -62,7 +65,7 @@ class SendEmbeds : Plugin() {
                             setBackgroundColor(0)
                             setOnClickListener {
                                 val channelId = StoreStream.getChannelsSelected().id
-                                EmbedModal(channelId, settings).show(Utils.appActivity.supportFragmentManager, ClockFactory.get().currentTimeMillis().toString())
+                                EmbedModal(channelId, settings).show(fragmentManager, "SendEmbeds")
                             }
                             setPadding(0, 0, 8, 0)
                             setClickable(true)
