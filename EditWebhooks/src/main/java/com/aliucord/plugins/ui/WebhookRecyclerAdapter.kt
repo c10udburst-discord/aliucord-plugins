@@ -31,7 +31,7 @@ class WebhookRecyclerAdapter(
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = webhooks.elementAt(position).let {
         holder.name.text = it.name
-        IconUtils.setIcon(holder.icon, it.avatarUrl)
+        IconUtils.setIcon(holder.icon, it.avatarUrl+"?size=128")
     }
 
     override fun getItemCount(): Int {

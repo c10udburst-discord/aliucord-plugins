@@ -23,6 +23,10 @@ import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
 import androidx.fragment.app.FragmentManager
 
+import com.discord.api.message.attachment.MessageAttachment
+import com.discord.utilities.SnowflakeUtils
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
+
 class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
     
 
@@ -35,13 +39,14 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
 
         val deleteIcon = ContextCompat.getDrawable(context, R.d.ic_delete_24dp)
         val copyIcon = ContextCompat.getDrawable(context, R.d.ic_copy_24dp)
+        val avatarIcon = ContextCompat.getDrawable(context, R.d.ic_profile_24dp)
 
         val title = TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply {
             text = webhook.name
         }
         
         val deleteWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-            text = "Delete webhook"
+            text = "Delete"
             setCompoundDrawablesRelativeWithIntrinsicBounds(deleteIcon, null, null, null)
             setOnClickListener {
                 val coDialog = ConfirmDialog()
@@ -49,7 +54,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                                 .setDescription("Do you want to delete \"${webhook.name}\" webhook?")
                 coDialog.setOnOkListener {
                     coDialog.dismiss()
-                    Utils.threadPool.execute { deleteWebhook(webhook.id) }
+                    Utils.threadPool.execute { deleteWebhook() }
             
                 }
                 coDialog.show(parentFragmentManager, "aaaaaa")
@@ -58,7 +63,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
         }
 
         val copyWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
-            text = "Copy webhook url"
+            text = "Copy url"
             setCompoundDrawablesRelativeWithIntrinsicBounds(copyIcon, null, null, null)
             setOnClickListener {
                 Utils.setClipboard("Webhook Url", webhook.url)
@@ -68,15 +73,27 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
             setClickable(true)
         }
 
+        val viewAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+            text = "View avatar"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(avatarIcon, null, null, null)
+            setOnClickListener {
+                viewAvatar()
+            }
+            setClickable(true)
+        }
+
         layout.addView(title)
         layout.addView(deleteWebhook)
         layout.addView(copyWebhook)
 
+        if (webhook.avatar != null)
+            layout.addView(viewAvatar)
+
         return layout
     }
 
-    private fun deleteWebhook(id: String?) {
-        Http.Request("https://discord.com/api/v9/webhooks/%s".format(id), "DELETE")
+    private fun deleteWebhook() {
+        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "DELETE")
                 .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
                 .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
                 .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
@@ -84,5 +101,25 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 .execute()
         Utils.showToast(context, "Webhook deleted")
         dismiss()
+    }
+
+    private fun viewAvatar() {
+        val msgClass = MessageAttachment::class.java
+        val filenameField = msgClass.getDeclaredField("filename").apply { setAccessible(true) }
+        val idField = msgClass.getDeclaredField("id").apply { setAccessible(true) }
+        val urlField = msgClass.getDeclaredField("url").apply { setAccessible(true) }
+        val proxyUrlField = msgClass.getDeclaredField("proxyUrl").apply { setAccessible(true) }
+
+        val attachment = ReflectUtils.allocateInstance(MessageAttachment::class.java)
+        try {
+            filenameField.set(attachment, "%s.webp".format(webhook.name))
+            idField.set(attachment, SnowflakeUtils.fromTimestamp(System.currentTimeMillis()))
+            urlField.set(attachment, webhook.avatarUrl+"?size=2048")
+            proxyUrlField.set(attachment, webhook.avatarUrl+"?size=2048")
+        } catch (err: Throwable) {
+            return
+        }
+
+        WidgetChatListAdapterItemAttachment.Companion.`access$navigateToAttachment`(WidgetChatListAdapterItemAttachment.Companion, view?.context, attachment)
     }
 }

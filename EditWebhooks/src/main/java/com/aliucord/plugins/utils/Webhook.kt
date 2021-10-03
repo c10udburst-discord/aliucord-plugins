@@ -12,6 +12,6 @@ data class Webhook(
         }
     val avatarUrl: String
         get() {
-            return "https://cdn.discordapp.com/avatars/%s/%s.webp?size=128".format(id, avatar)
+            return "https://cdn.discordapp.com/avatars/%s/%s.webp".format(id, avatar)
         }
 }
