@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
@@ -91,6 +92,7 @@ class DeleteEmbeds : Plugin() {
                     text = "Delete Embed"
                     id = deleteEmbedId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
+                    typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                 }
 
                 linearLayout.addView(deleteEmbed, 1)
