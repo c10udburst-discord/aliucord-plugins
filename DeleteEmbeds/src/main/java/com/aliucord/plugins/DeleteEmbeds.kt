@@ -15,7 +15,6 @@ import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
 import com.aliucord.patcher.PinePatchFn
 import com.discord.databinding.WidgetChatListActionsBinding
-import com.discord.models.domain.emoji.Emoji
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
@@ -23,7 +22,6 @@ import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
-import com.aliucord.fragments.ConfirmDialog
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 import com.aliucord.Http
@@ -58,19 +56,9 @@ class DeleteEmbeds : Plugin() {
 
                     if (!deleteEmbed.hasOnClickListeners()) deleteEmbed.setOnClickListener {
                         try {
-                            val fragmentManager = (callFrame.thisObject as WidgetChatListActions).parentFragmentManager
-
-                            val coDialog = ConfirmDialog()
-                                    .setTitle("Delete Embed")
-                                    .setDescription("Do you want to delete this embed?")
-                            coDialog.setOnOkListener {
-                                coDialog.dismiss()
-                                Utils.threadPool.execute {
-                                    deleteEmbed(message.channelId, message.id)
-                                }
-                            }
-                            (callFrame.thisObject as WidgetChatListActions).dismiss()
-                            coDialog.show(fragmentManager, "aaaaaa")
+                             Utils.threadPool.execute {
+                                 deleteEmbed(message.channelId, message.id)
+                             }
                         } catch (e: IllegalAccessException) {
                             Utils.showToast(context, "Internal error occured.")
                             e.printStackTrace()
