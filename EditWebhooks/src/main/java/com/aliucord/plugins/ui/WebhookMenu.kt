@@ -62,7 +62,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 coDialog.show(parentFragmentManager, "aaaaaa")
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
+            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         }
 
         val copyWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -74,7 +74,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 dismiss()
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
+            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         }
 
         val viewAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -84,7 +84,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 viewAvatar()
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
+            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         }
 
         layout.addView(title)
