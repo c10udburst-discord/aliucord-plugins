@@ -59,6 +59,7 @@ class DeleteEmbeds : Plugin() {
                              Utils.threadPool.execute {
                                  deleteEmbed(message.channelId, message.id)
                              }
+                             (callFrame.thisObject as WidgetChatListActions).dismiss()
                         } catch (e: IllegalAccessException) {
                             Utils.showToast(context, "Internal error occured.")
                             e.printStackTrace()
