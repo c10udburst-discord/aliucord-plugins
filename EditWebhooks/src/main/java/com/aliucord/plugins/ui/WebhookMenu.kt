@@ -14,6 +14,8 @@ import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 import android.widget.TextView
 import com.aliucord.fragments.ConfirmDialog
+import com.aliucord.Constants
+import androidx.core.content.res.ResourcesCompat
 
 import com.aliucord.Http
 import com.google.gson.JsonObject
@@ -60,6 +62,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 coDialog.show(parentFragmentManager, "aaaaaa")
             }
             setClickable(true)
+            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
         }
 
         val copyWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -71,6 +74,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 dismiss()
             }
             setClickable(true)
+            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
         }
 
         val viewAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -80,6 +84,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 viewAvatar()
             }
             setClickable(true)
+            typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
         }
 
         layout.addView(title)

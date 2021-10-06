@@ -13,7 +13,7 @@ import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
 import com.aliucord.patcher.PinePatchFn
-import com.discord.models.domain.emoji.Emoji
+import androidx.core.content.res.ResourcesCompat
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.channels.settings.WidgetTextChannelSettings
 import com.discord.databinding.WidgetTextChannelSettingsBinding
@@ -21,6 +21,7 @@ import com.lytefast.flexinput.R
 import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.utils.ReflectUtils
+import com.aliucord.Constants
 import com.discord.stores.StoreStream
 import com.aliucord.fragments.ConfirmDialog
 import com.aliucord.Utils
@@ -76,6 +77,7 @@ class EditWebhooks : Plugin() {
                     text = "Edit Webhooks"
                     id = editWebooksId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(iconLeft, null, iconRight, null)
+                    typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                 }
 
                 linearLayout.addView(editWebhooks, 0)
