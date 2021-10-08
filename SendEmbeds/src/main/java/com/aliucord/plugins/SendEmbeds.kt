@@ -39,7 +39,7 @@ class SendEmbeds : Plugin() {
     }
 
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_qr_code_24dp)
+        val icon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
         Utils.tintToTheme(icon).setAlpha(0x99);
 
         commands.registerCommand(

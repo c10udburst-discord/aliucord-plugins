@@ -8,16 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import android.widget.TextView
 import com.lytefast.flexinput.R
 import com.aliucord.plugins.utils.Webhook
-import androidx.fragment.app.FragmentManager
 import com.aliucord.Utils
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.discord.utilities.icon.IconUtils
 import com.discord.utilities.color.ColorCompat
+import com.aliucord.plugins.ui.WebhookList
 
 class WebhookRecyclerAdapter(
     private val webhooks: List<Webhook>,
-    private val fragmentManager: FragmentManager
+    private val parent: WebhookList
 ) : RecyclerView.Adapter<ViewHolder>() {
 
     private val layoutId = Utils.getResId("widget_user_profile_adapter_item_server", "layout")
@@ -39,6 +39,6 @@ class WebhookRecyclerAdapter(
     }
 
     fun onClick(position: Int) = webhooks.elementAt(position).let {
-        WebhookMenu(it).show(Utils.appActivity.supportFragmentManager, it.name)
+        WebhookMenu(it, parent).show(parent.parentFragmentManager, it.name)
     }
 }

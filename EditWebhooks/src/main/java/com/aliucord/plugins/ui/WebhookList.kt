@@ -30,8 +30,12 @@ class WebhookList(val channel: Channel) : SettingsPage() {
     override fun onViewBound(view: View) {
         super.onViewBound(view)
         setActionBarTitle(channel.m())
-        val context = requireContext()
+        
+        fetchList()
+    }
 
+    public fun fetchList() {
+        val context = requireContext()
         Utils.threadPool.execute {
             val list = Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channel.h()), "GET")
                 .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
@@ -44,6 +48,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
 
 
             Utils.mainThread.post {
+                clear()
                 val shape = ShapeDrawable(RectShape())
                     .apply {
                         setTint(Color.TRANSPARENT)
@@ -59,7 +64,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
 
                 val recyclerView = RecyclerView(context)
                     .apply {
-                        adapter = WebhookRecyclerAdapter(list.toList(), parentFragmentManager)
+                        adapter = WebhookRecyclerAdapter(list.toList(), this@WebhookList)
                         layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                         addItemDecoration(decoration)
                     }
@@ -97,5 +102,6 @@ class WebhookList(val channel: Channel) : SettingsPage() {
                 .setHeader("Accept", "*/*")
                 .executeWithJson(WebhookRequest(name))
         Utils.showToast(context, "Webhook created")
+        fetchList()
     }
 }

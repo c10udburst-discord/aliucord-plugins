@@ -37,7 +37,7 @@ import com.aliucord.plugins.ui.WebhookList
 class EditWebhooks : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val iconLeft = ContextCompat.getDrawable(context, R.d.ic_qr_code_24dp)
+        val iconLeft = ContextCompat.getDrawable(context, R.d.ic_send_24dp)
         val iconRight = ContextCompat.getDrawable(context, R.d.icon_carrot)
         val editWebooksId = View.generateViewId()
 

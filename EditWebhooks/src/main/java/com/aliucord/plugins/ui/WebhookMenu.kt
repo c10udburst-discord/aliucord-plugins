@@ -29,9 +29,13 @@ import com.discord.api.message.attachment.MessageAttachment
 import com.discord.utilities.SnowflakeUtils
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
 
-class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
-    
+import com.aliucord.plugins.ui.WebhookList
 
+class WebhookMenu(
+    private val webhook: Webhook,
+    private val parent: WebhookList
+) : AppBottomSheet() {
+    
     override fun getContentViewResId() = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, bundle: Bundle?): View {
@@ -105,6 +109,7 @@ class WebhookMenu(private val webhook: Webhook) : AppBottomSheet() {
                 .setHeader("Accept", "*/*")
                 .execute()
         Utils.showToast(context, "Webhook deleted")
+        parent.fetchList()
         dismiss()
     }
 
