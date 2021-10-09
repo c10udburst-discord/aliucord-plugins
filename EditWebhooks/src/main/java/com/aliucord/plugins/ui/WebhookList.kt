@@ -84,7 +84,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
                                     }
                                     inDialog.dismiss()
                                 }
-                        inDialog.show(parentFragmentManager, "bbbbb")
+                        inDialog.show(parentFragmentManager, "CreateWebhook")
                     }
                 }
 
@@ -101,7 +101,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
                 .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
                 .setHeader("Accept", "*/*")
                 .executeWithJson(WebhookRequest(name))
-        Utils.showToast(context, "Webhook created")
+        Utils.showToast("Webhook created")
         fetchList()
     }
 }

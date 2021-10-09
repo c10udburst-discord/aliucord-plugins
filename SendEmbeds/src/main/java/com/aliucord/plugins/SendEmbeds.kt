@@ -15,9 +15,8 @@ import androidx.core.content.ContextCompat
 import com.lytefast.flexinput.R
 import android.view.View
 import com.aliucord.patcher.Patcher
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.aliucord.api.SettingsAPI
-import top.canyie.pine.Pine.CallFrame
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.lytefast.flexinput.fragment.FlexInputFragment
 import android.os.Bundle
@@ -40,7 +39,7 @@ class SendEmbeds : Plugin() {
 
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
-        Utils.tintToTheme(icon).setAlpha(0x99);
+        Utils.tintToTheme(icon)?.setAlpha(0x99);
 
         commands.registerCommand(
             "embed",
@@ -52,7 +51,7 @@ class SendEmbeds : Plugin() {
         }
 
         with(FlexInputFragment::class.java, { 
-            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame -> 
+            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame -> 
                 try {
                     if (settings.getBool("SendEmbeds_ButtonVisible", false)) {
                         

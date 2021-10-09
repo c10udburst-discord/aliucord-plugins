@@ -2,7 +2,8 @@ package com.aliucord.plugins
 
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
+import de.robv.android.xposed.XC_MethodHook.MethodHookParam
 import com.aliucord.patcher.Patcher
 import com.aliucord.Utils
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
@@ -24,7 +25,7 @@ class HighlightOwnMessages : Plugin() {
         val textViewId = Utils.getResId("chat_list_adapter_item_text", "id")
         
         with(WidgetChatListAdapterItemMessage::class.java) {
-            patcher.patch(getDeclaredMethod("onConfigure", Int::class.java, ChatListEntry::class.java), PinePatchFn { callFrame -> try {
+            patcher.patch(getDeclaredMethod("onConfigure", Int::class.java, ChatListEntry::class.java), Hook { callFrame -> try {
                 val message = callFrame.args[1] as MessageEntry
 
                 val view = callFrame.thisObject as WidgetChatListAdapterItemMessage

@@ -334,7 +334,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                 .replace("#", "")
                 .toInt(16)
         } catch(e:Throwable) {
-            Utils.showToast(context, "Color parser error: %s".format(e.message))
+            Utils.showToast("Color parser error: %s".format(e.message))
             e.printStackTrace()
         }
         return 0

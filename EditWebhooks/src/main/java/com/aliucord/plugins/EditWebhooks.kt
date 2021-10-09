@@ -12,13 +12,12 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import androidx.core.content.res.ResourcesCompat
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.channels.settings.WidgetTextChannelSettings
 import com.discord.databinding.WidgetTextChannelSettingsBinding
 import com.lytefast.flexinput.R
-import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.utils.ReflectUtils
 import com.aliucord.Constants
@@ -37,14 +36,14 @@ import com.aliucord.plugins.ui.WebhookList
 class EditWebhooks : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val iconLeft = ContextCompat.getDrawable(context, R.d.ic_send_24dp)
+        val iconLeft = ContextCompat.getDrawable(context, R.d.ic_publish_24dp)
         val iconRight = ContextCompat.getDrawable(context, R.d.icon_carrot)
         val editWebooksId = View.generateViewId()
 
         with(WidgetTextChannelSettings::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
 
-            patcher.patch(getDeclaredMethod("configureUI", WidgetTextChannelSettings.Model::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("configureUI", WidgetTextChannelSettings.Model::class.java), Hook { callFrame ->
                 try {
                     val channel = (callFrame.args[0] as WidgetTextChannelSettings.Model).channel
 
@@ -64,7 +63,7 @@ class EditWebhooks : Plugin() {
                 }
             })
 
-            patcher.patch(getDeclaredMethod("onViewBound", View::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("onViewBound", View::class.java), Hook { callFrame ->
                 val coordinatorLayout = (callFrame.args[0] as CoordinatorLayout)
                 val nestedScrollView = coordinatorLayout.getChildAt(1) as NestedScrollView
                 val linearLayout = (nestedScrollView.getChildAt(0) as LinearLayout).getChildAt(4) as LinearLayout

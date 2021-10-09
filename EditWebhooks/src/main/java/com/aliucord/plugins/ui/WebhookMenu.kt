@@ -14,8 +14,10 @@ import com.discord.views.CheckedSetting
 import com.lytefast.flexinput.R
 import android.widget.TextView
 import com.aliucord.fragments.ConfirmDialog
+import com.aliucord.fragments.InputDialog
 import com.aliucord.Constants
 import androidx.core.content.res.ResourcesCompat
+import com.aliucord.plugins.utils.WebhookRequest
 
 import com.aliucord.Http
 import com.google.gson.JsonObject
@@ -46,6 +48,7 @@ class WebhookMenu(
         val deleteIcon = ContextCompat.getDrawable(context, R.d.ic_delete_24dp)
         val copyIcon = ContextCompat.getDrawable(context, R.d.ic_copy_24dp)
         val avatarIcon = ContextCompat.getDrawable(context, R.d.ic_profile_24dp)
+        val renameIcon = ContextCompat.getDrawable(context, R.d.ic_edit_24dp)
 
         val title = TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply {
             text = webhook.name
@@ -57,13 +60,14 @@ class WebhookMenu(
             setOnClickListener {
                 val coDialog = ConfirmDialog()
                                 .setTitle("Delete webhook")
+                                .setIsDangerous(true)
                                 .setDescription("Do you want to delete \"${webhook.name}\" webhook?")
                 coDialog.setOnOkListener {
                     coDialog.dismiss()
                     Utils.threadPool.execute { deleteWebhook() }
             
                 }
-                coDialog.show(parentFragmentManager, "aaaaaa")
+                coDialog.show(parentFragmentManager, "DeleteWebhook")
             }
             setClickable(true)
             typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
@@ -74,7 +78,7 @@ class WebhookMenu(
             setCompoundDrawablesRelativeWithIntrinsicBounds(copyIcon, null, null, null)
             setOnClickListener {
                 Utils.setClipboard("Webhook Url", webhook.url)
-                Utils.showToast(context, "Webhook url copied to clipboard")
+                Utils.showToast("Webhook url copied to clipboard")
                 dismiss()
             }
             setClickable(true)
@@ -91,10 +95,31 @@ class WebhookMenu(
             typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         }
 
-        layout.addView(title)
-        layout.addView(deleteWebhook)
-        layout.addView(copyWebhook)
+        val renameWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+            text = "Rename"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(renameIcon, null, null, null)
+            setOnClickListener {
+                val inDialog = InputDialog()
+                                .setTitle("Rename webhook")
+                                .setDescription("Enter name of the name for ${webhook.name}")
+                                .setPlaceholderText("Webhook Name")
+                                inDialog.setOnOkListener {
+                                    Utils.threadPool.execute {
+                                        rename(inDialog.input.toString().trim())
+                                    }
+                                    inDialog.dismiss()
+                                }
+                        inDialog.show(parentFragmentManager, "RenameWebhook")
+            }
+            setClickable(true)
+            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
+        }
 
+
+        layout.addView(title)
+        layout.addView(copyWebhook)
+        layout.addView(renameWebhook)
+        layout.addView(deleteWebhook)
         if (webhook.avatar != null)
             layout.addView(viewAvatar)
 
@@ -108,7 +133,7 @@ class WebhookMenu(
                 .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
                 .setHeader("Accept", "*/*")
                 .execute()
-        Utils.showToast(context, "Webhook deleted")
+        Utils.showToast("Webhook deleted")
         parent.fetchList()
         dismiss()
     }
@@ -131,5 +156,17 @@ class WebhookMenu(
         }
 
         WidgetChatListAdapterItemAttachment.Companion.`access$navigateToAttachment`(WidgetChatListAdapterItemAttachment.Companion, view?.context, attachment)
+    }
+
+    private fun rename(newName: String) {
+        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "PATCH")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .executeWithJson(WebhookRequest(newName))
+        Utils.showToast("Webhook renamed")
+        parent.fetchList()
+        dismiss()
     }
 }

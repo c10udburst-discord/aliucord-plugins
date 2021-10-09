@@ -27,7 +27,7 @@ class SendEmbedsSettings(private val plugin: SendEmbeds) : AppBottomSheet() {
                 count++
                 plugin.settings.setBool("SendEmbeds_SelfBotMode", count==7) // shh dont tell anyone
                 if (count == 7)
-                    Utils.showToast(context, "Uncaught exception on main thread")
+                    Utils.showToast("Uncaught exception on main thread")
             }
         }
         layout.addView(title)

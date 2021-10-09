@@ -13,12 +13,11 @@ import androidx.core.widget.NestedScrollView
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.InputDialog
-import com.aliucord.patcher.PinePatchFn
+import com.aliucord.patcher.Hook
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
-import top.canyie.pine.Pine.CallFrame
 import java.lang.reflect.InvocationTargetException
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
@@ -39,7 +38,7 @@ class DeleteEmbeds : Plugin() {
         with(WidgetChatListActions::class.java, {
             val getBinding = getDeclaredMethod("getBinding").apply { isAccessible = true }
 
-            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("configureUI", WidgetChatListActions.Model::class.java), Hook { callFrame ->
                 try {
                     val message = (callFrame.args[0] as WidgetChatListActions.Model).message
 
@@ -61,10 +60,10 @@ class DeleteEmbeds : Plugin() {
                              }
                              (callFrame.thisObject as WidgetChatListActions).dismiss()
                         } catch (e: IllegalAccessException) {
-                            Utils.showToast(context, "Internal error occured.")
+                            Utils.showToast("Internal error occured.")
                             e.printStackTrace()
                         } catch (e: InvocationTargetException) {
-                            Utils.showToast(context, "Internal error occured.")
+                            Utils.showToast("Internal error occured.")
                             e.printStackTrace()
                         }
                     }
@@ -72,7 +71,7 @@ class DeleteEmbeds : Plugin() {
                 }
             })
 
-            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), PinePatchFn { callFrame: CallFrame ->
+            patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
 

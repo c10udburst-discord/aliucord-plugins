@@ -10,7 +10,7 @@ import com.lytefast.flexinput.R
 import com.aliucord.plugins.utils.Webhook
 import com.aliucord.Utils
 import android.view.LayoutInflater
-import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.discord.utilities.icon.IconUtils
 import com.discord.utilities.color.ColorCompat
 import com.aliucord.plugins.ui.WebhookList
@@ -26,11 +26,12 @@ class WebhookRecyclerAdapter(
         val layout = LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
         layout.setBackgroundColor(ColorCompat.getThemedColor(parent.context, R.b.colorBackgroundSecondary))
         layout.setClickable(true)
-        return ViewHolder(this, layout as RelativeLayout)
+        return ViewHolder(this, layout as ConstraintLayout)
     }
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = webhooks.elementAt(position).let {
         holder.name.text = it.name
+        holder.subTitle.text = it.typeReadable
         IconUtils.setIcon(holder.icon, it.avatarUrl+"?size=128")
     }
 
