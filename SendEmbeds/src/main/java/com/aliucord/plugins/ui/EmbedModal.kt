@@ -234,7 +234,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                     })
                     dismiss()
                 } catch (e: Throwable) {
-                    Utils.showToast(context, "An error occured")
+                    Utils.showToast("An error occured")
                     e.printStackTrace()
                 }
             }
