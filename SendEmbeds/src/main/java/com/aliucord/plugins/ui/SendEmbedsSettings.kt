@@ -39,6 +39,13 @@ class SendEmbedsSettings(private val plugin: SendEmbeds) : AppBottomSheet() {
                 plugin.settings.setBool(key, it)
             }
         })
+        layout.addView(Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "NQN compatibility", "Sends links with markdown syntax, so NQN will convert them to webhooks without links visible").apply {
+            val key = "SendEmbeds_NQNCompatibility"
+            isChecked = plugin.settings.getBool(key, true)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
         return layout
     }
 }
