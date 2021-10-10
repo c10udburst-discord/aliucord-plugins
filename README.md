@@ -6,6 +6,8 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 - [EditWebhooks](https://github.com/C10udburst/aliucord-plugins/raw/builds/EditWebhooks.zip) |
   View, delete and create webhooks
 - [HighlightOwnMessages](https://github.com/C10udburst/aliucord-plugins/raw/builds/HighlightOwnMessages.zip) |
-  Display messages send by you on the right, just like in signal, whatsapp or messenger. (Kinda wonky currently)
+  Display messages send by you on the right, just like in signal, whatsapp or messenger (Kinda wonky currently).
+- [LinkReplace](https://github.com/C10udburst/aliucord-plugins/raw/builds/LinkReplace.zip) |
+  Replace popular internet platforms' links with alternative open source front-ends.
 - [SendEmbeds](https://github.com/C10udburst/aliucord-plugins/raw/builds/SendEmbeds.zip) |
   Adds a `/embed` command and a button  which opens an ui which can be used to send embeds (using links and webhooks).

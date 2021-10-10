@@ -3,7 +3,6 @@ package com.aliucord.plugins
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
-import de.robv.android.xposed.XC_MethodHook.MethodHookParam
 import com.aliucord.patcher.Patcher
 import com.aliucord.Utils
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage

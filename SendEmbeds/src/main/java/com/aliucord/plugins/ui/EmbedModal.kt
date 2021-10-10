@@ -41,6 +41,7 @@ import com.aliucord.utils.RxUtils.subscribe
 import com.aliucord.api.SettingsAPI
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import java.net.URLEncoder
+import com.aliucord.Logger;
 
 fun View.setMarginEnd(
     value: Int
@@ -52,6 +53,7 @@ fun View.setMarginEnd(
 }
 
 class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet() {
+    private val logger = Logger("SendEmbeds")
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
@@ -232,11 +234,11 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                             }
                         }
                     })
-                    dismiss()
                 } catch (e: Throwable) {
                     Utils.showToast("An error occured")
-                    e.printStackTrace()
+                    logger.error(e)
                 }
+                dismiss()
             }
         }
 
@@ -251,13 +253,18 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
     }
 
     private fun getWebhooks(): Array<Webhook> {
-        return Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
-        .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-        .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-        .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-        .setHeader("Accept", "*/*")
-        .execute()
-        .json(Array<Webhook>::class.java)
+        try {
+            return Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .execute()
+                .json(Array<Webhook>::class.java)
+        } catch (e: Throwable) {
+            logger.error(e)
+        }
+        return emptyArray()
     }
 
     private fun sendWebhookEmbed(webhook: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int)  {
