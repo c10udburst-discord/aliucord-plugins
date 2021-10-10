@@ -14,7 +14,7 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
 
     init {
         radius = DimenUtils.getDefaultCardRadius().toFloat()
-        setCardBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondary))
+        setCardBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundTertiary))
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         val p = DimenUtils.getDefaultPadding()
 
