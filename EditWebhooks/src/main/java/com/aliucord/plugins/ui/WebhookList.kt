@@ -100,7 +100,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
                 .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
                 .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
                 .setHeader("Accept", "*/*")
-                .executeWithJson(WebhookRequest(name))
+                .executeWithJson(WebhookRequest(name, null))
         Utils.showToast("Webhook created")
         fetchList()
     }

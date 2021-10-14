@@ -18,6 +18,7 @@ import com.aliucord.fragments.InputDialog
 import com.aliucord.Constants
 import androidx.core.content.res.ResourcesCompat
 import com.aliucord.plugins.utils.WebhookRequest
+import java.util.Base64
 
 import com.aliucord.Http
 import com.google.gson.JsonObject
@@ -45,10 +46,12 @@ class WebhookMenu(
         val layout = LinearLayout(context)
         layout.setBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorBackgroundPrimary))
 
+        val font = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         val deleteIcon = ContextCompat.getDrawable(context, R.d.ic_delete_24dp)
         val copyIcon = ContextCompat.getDrawable(context, R.d.ic_copy_24dp)
         val avatarIcon = ContextCompat.getDrawable(context, R.d.ic_profile_24dp)
         val renameIcon = ContextCompat.getDrawable(context, R.d.ic_edit_24dp)
+        val changeAvatarIcon = ContextCompat.getDrawable(context, R.d.ic_camera_24dp)
 
         val title = TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply {
             text = webhook.name
@@ -70,7 +73,7 @@ class WebhookMenu(
                 coDialog.show(parentFragmentManager, "DeleteWebhook")
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
+            typeface = font
         }
 
         val copyWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -82,7 +85,7 @@ class WebhookMenu(
                 dismiss()
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
+            typeface = font
         }
 
         val viewAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -92,7 +95,7 @@ class WebhookMenu(
                 viewAvatar()
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
+            typeface = font
         }
 
         val renameWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -112,16 +115,38 @@ class WebhookMenu(
                         inDialog.show(parentFragmentManager, "RenameWebhook")
             }
             setClickable(true)
-            typeface = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
+            typeface = font
+        }
+
+        val setAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+            text = "Change avatar"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(changeAvatarIcon, null, null, null)
+            setOnClickListener {
+                val inDialog = InputDialog()
+                                .setTitle("Set Avatar")
+                                .setDescription("Enter image url")
+                                .setPlaceholderText("image url")
+                                inDialog.setOnOkListener {
+                                    Utils.threadPool.execute {
+                                        setAvatar(inDialog.input.toString().trim())
+                                    }
+                                    inDialog.dismiss()
+                                }
+                        inDialog.show(parentFragmentManager, "SetAvatar")
+            }
+            setClickable(true)
+            typeface = font
         }
 
 
         layout.addView(title)
-        layout.addView(copyWebhook)
-        layout.addView(renameWebhook)
-        layout.addView(deleteWebhook)
+        if (webhook.type == 1)
+            layout.addView(copyWebhook)
         if (webhook.avatar != null)
             layout.addView(viewAvatar)
+        layout.addView(renameWebhook)
+        layout.addView(setAvatar)
+        layout.addView(deleteWebhook)
 
         return layout
     }
@@ -164,8 +189,32 @@ class WebhookMenu(
                 .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
                 .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
                 .setHeader("Accept", "*/*")
-                .executeWithJson(WebhookRequest(newName))
+                .executeWithJson(WebhookRequest(newName, null))
         Utils.showToast("Webhook renamed")
+        parent.fetchList()
+        dismiss()
+    }
+
+    private fun setAvatar(url: String) {
+        val type = url.substring(url.lastIndexOf('.') + 1)
+        setAvatar(Http.Request(url)
+            .setHeader("Accept", "*/*")
+            .execute()
+            .bytes, 
+        type)
+    }
+
+    private fun setAvatar(bytes: ByteArray, type: String) {
+        var dataType = type.lowercase()
+        if (dataType == "jpg") dataType = "jpeg"
+        val datauri = "data:image/%s;base64,%s".format(dataType, Base64.getEncoder().encodeToString(bytes))
+        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "PATCH")
+                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
+                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
+                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+                .setHeader("Accept", "*/*")
+                .executeWithJson(WebhookRequest(null, datauri))
+        Utils.showToast("Avatar changed")
         parent.fetchList()
         dismiss()
     }
