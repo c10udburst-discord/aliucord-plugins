@@ -84,7 +84,7 @@ class DeleteEmbeds : Plugin() {
                     typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                 }
 
-                linearLayout.addView(deleteEmbed, 1)
+                linearLayout.addView(deleteEmbed, 5)
             })
         })
     }
