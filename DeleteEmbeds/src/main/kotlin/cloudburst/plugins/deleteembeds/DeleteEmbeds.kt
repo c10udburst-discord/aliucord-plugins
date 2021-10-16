@@ -76,7 +76,6 @@ class DeleteEmbeds : Plugin() {
                 val ctx = linearLayout.context
                 val idx = layout.indexOfChild(layout.findViewById(Utils.getResId("dialog_chat_actions_delete", "id"))) + 1
 
-
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val deleteEmbed = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
@@ -86,7 +85,7 @@ class DeleteEmbeds : Plugin() {
                     typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                 }
 
-                linearLayout.addView(deleteEmbed, 5)
+                linearLayout.addView(deleteEmbed, idx)
             })
         })
     }
