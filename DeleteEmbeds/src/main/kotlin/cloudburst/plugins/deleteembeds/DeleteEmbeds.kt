@@ -74,7 +74,7 @@ class DeleteEmbeds : Plugin() {
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame ->
                 val linearLayout = (callFrame.args[0] as NestedScrollView).getChildAt(0) as LinearLayout
                 val ctx = linearLayout.context
-                val idx = layout.indexOfChild(layout.findViewById(Utils.getResId("dialog_chat_actions_delete", "id"))) + 1
+                val idx = linearLayout.indexOfChild(linearLayout.findViewById(Utils.getResId("dialog_chat_actions_delete", "id"))) + 1
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
