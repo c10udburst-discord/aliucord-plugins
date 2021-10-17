@@ -22,16 +22,15 @@ class LinkReplace : Plugin() {
 
     override fun start(context: Context) {
         mSettings = settings
-        val replacementRules = settings.getObject("LinkReplace_Rules", LinkReplacement.DEFAULT_LIST, Array<LinkReplacement>::class.java)
+        LinkReplace.replacementRules = settings.getObject("LinkReplace_Rules", LinkReplacement.DEFAULT_LIST, Array<LinkReplacement>::class.java)
 
         with(Message::class.java) {
             patcher.patch(getDeclaredMethod("getContent"), Hook { callFrame -> try {
                 var _this = callFrame.thisObject as Message
                 var content = ReflectUtils.getField(_this, "content") as String
-                for (rule in replacementRules) {
+                for (rule in LinkReplace.replacementRules) {
                     if (rule.fromRegex.containsMatchIn(content)) {
                         content = rule.fromRegex.replace(content, rule.toDomain)
-                        Patcher.logger.info(content)
                         callFrame.result = content
                         break
                     }
@@ -46,5 +45,6 @@ class LinkReplace : Plugin() {
 
     companion object {
         lateinit var mSettings: SettingsAPI
+        var replacementRules = LinkReplacement.DEFAULT_LIST
     }
 }
