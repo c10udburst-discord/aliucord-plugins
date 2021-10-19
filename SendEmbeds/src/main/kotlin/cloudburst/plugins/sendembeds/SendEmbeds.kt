@@ -39,6 +39,7 @@ class SendEmbeds : Plugin() {
 
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
+        var fragmentManager = Utils.appActivity.supportFragmentManager
         Utils.tintToTheme(icon)?.setAlpha(0x99);
 
         commands.registerCommand(
@@ -46,17 +47,17 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-            EmbedModal(ctx.getChannelId(), settings).show(Utils.appActivity.supportFragmentManager, "SendEmbeds")
+            EmbedModal(ctx.getChannelId(), settings).show(fragmentManager, "SendEmbeds")
             return@registerCommand null
         }
 
         with(FlexInputFragment::class.java, { 
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame -> 
                 try {
+                    fragmentManager = (callFrame.thisObject as FlexInputFragment).parentFragmentManager
                     if (settings.getBool("SendEmbeds_ButtonVisible", false)) {
                         
                         val view = ((callFrame.args[0] as LinearLayout).getChildAt(1) as RelativeLayout).getChildAt(0) as LinearLayout
-                        val fragmentManager = (callFrame.thisObject as FlexInputFragment).parentFragmentManager
                     
                         val btn = AppCompatImageButton(ContextThemeWrapper(view.context, R.h.UiKit_ImageView_Clickable), null, 0).apply { 
                             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
@@ -80,5 +81,6 @@ class SendEmbeds : Plugin() {
 
     override fun stop(context: Context) {
         commands.unregisterAll()
+        patcher.unpatchAll()
     }
 }
