@@ -52,7 +52,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
                 val shape = ShapeDrawable(RectShape())
                     .apply {
                         setTint(Color.TRANSPARENT)
-                        intrinsicHeight = DimenUtils.getDefaultPadding()
+                        intrinsicHeight = DimenUtils.defaultPadding
                     }
 
                 val decoration = DividerItemDecoration(

@@ -59,7 +59,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
         val context = view.context
-        val padding = DimenUtils.getDefaultPadding()
+        val padding = DimenUtils.defaultPadding
         val p = padding / 2;
         this.setPadding(padding)
 

@@ -42,7 +42,7 @@ class ReplacerSettings : SettingsPage() {
             val decoration = DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL)
             ShapeDrawable(RectShape()).run {
                 setTint(Color.TRANSPARENT)
-                intrinsicHeight = DimenUtils.getDefaultPadding()
+                intrinsicHeight = DimenUtils.defaultPadding
                 decoration.setDrawable(this)
             }
             addItemDecoration(decoration)
@@ -51,7 +51,7 @@ class ReplacerSettings : SettingsPage() {
 
         Button(ctx).run {
             text = "New Rule"
-            DimenUtils.getDefaultPadding().let {
+            DimenUtils.defaultPadding.let {
                 setPadding(it, it, it, it)
             }
             setOnClickListener {
@@ -71,7 +71,7 @@ class ReplacerSettings : SettingsPage() {
         }
 
         if (headerBar.findViewById<View>(headerId) == null) {
-            val p = (DimenUtils.getDefaultPadding() / 2)
+            val p = (DimenUtils.defaultPadding / 2)
 
             val exportBtn = ToolbarButton(ctx)
             exportBtn.setId(headerId)

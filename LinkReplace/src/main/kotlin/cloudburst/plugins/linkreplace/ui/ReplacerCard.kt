@@ -13,10 +13,10 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
     val toDomain: TextInput
 
     init {
-        radius = DimenUtils.getDefaultCardRadius().toFloat()
+        radius = DimenUtils.defaultCardRadius.toFloat()
         setCardBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundTertiary))
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        val p = DimenUtils.getDefaultPadding()
+        val p = DimenUtils.defaultPadding
 
         val linearLayout = com.aliucord.widgets.LinearLayout(ctx).apply {
             regex = TextInput(ctx).apply { 
