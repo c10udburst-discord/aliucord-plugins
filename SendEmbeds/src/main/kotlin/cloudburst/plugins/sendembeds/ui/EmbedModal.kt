@@ -169,9 +169,6 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                             "rauf.wtf/embed"
                         )
                         
-                        if (settings.getBool("SendEmbeds_SelfBotMode", false)) {
-                            modes.add("selfbot")
-                        }
     
                         webhooks.keys.forEach {
                             modes.add("webhook: %s".format(it))
@@ -205,15 +202,6 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                             if (mode.startsWith("webhooks/")) {
                                 sendWebhookEmbed(
                                     mode,
-                                    authorInput.editText?.text.toString(), 
-                                    titleInput.editText?.text.toString(), 
-                                    contentInput.editText?.text.toString(), 
-                                    urlInput.editText?.text.toString(), 
-                                    imageInput.editText?.text.toString(),
-                                    toColorInt(colorInput.editText?.text.toString())
-                                )
-                            } else if (mode == "selfbot") {
-                                sendSelfBotEmbed(
                                     authorInput.editText?.text.toString(), 
                                     titleInput.editText?.text.toString(), 
                                     contentInput.editText?.text.toString(), 
@@ -283,34 +271,6 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                     )
                 )
             ))
-    }
-
-    // this is hidden mkay?
-    private fun sendSelfBotEmbed(author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
-        try {
-            val msg = Message(
-                null,
-                false,
-                NonceGenerator.computeNonce(ClockFactory.get()).toString(),
-                Embed(
-                    Author(author),
-                    title, 
-                    content,
-                    url,
-                    EmbedImage(imageUrl),
-                    color
-                )
-            )
-            Http.Request("https://discord.com/api/v9/channels/%d/messages".format(channelId), "POST")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .executeWithJson(msg)
-            .text()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
     }
 
     private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
