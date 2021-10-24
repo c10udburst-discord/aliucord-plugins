@@ -33,6 +33,14 @@ import com.aliucord.fragments.AppFragmentProxy
 @AliucordPlugin
 class SendEmbeds : Plugin() {
     
+    //                                         channel,  author, title,  content, url,    imageUrl, color
+    public val extraFunctions = hashMapOf<String, (Long,   String, String, String,  String, String,   String) -> Unit>()
+    public val modes = mutableListOf(
+        "embed.rauf.workers.dev",
+        "embed.rauf.wtf",
+        "rauf.wtf/embed"
+    )
+
     init {
         settingsTab = SettingsTab(SendEmbedsSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(this)
     }
@@ -47,7 +55,7 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-            EmbedModal(ctx.getChannelId(), settings).show(fragmentManager, "SendEmbeds")
+            EmbedModal(ctx.getChannelId(), this).show(fragmentManager, "SendEmbeds")
             return@registerCommand null
         }
 
@@ -65,7 +73,7 @@ class SendEmbeds : Plugin() {
                             setBackgroundColor(0)
                             setOnClickListener {
                                 val channelId = StoreStream.getChannelsSelected().id
-                                EmbedModal(channelId, settings).show(fragmentManager, "SendEmbeds")
+                                EmbedModal(channelId, this@SendEmbeds).show(fragmentManager, "SendEmbeds")
                             }
                             setPadding(0, 0, 8, 0)
                             setClickable(true)

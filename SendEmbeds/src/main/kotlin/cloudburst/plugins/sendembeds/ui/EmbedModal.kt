@@ -21,6 +21,7 @@ import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 
 import cloudburst.plugins.sendembeds.utils.*
+import cloudburst.plugins.sendembeds.SendEmbeds
 import com.aliucord.Http
 
 import com.discord.utilities.permissions.PermissionUtils
@@ -38,9 +39,9 @@ import com.discord.utilities.time.ClockFactory
 import com.discord.restapi.RestAPIParams
 import com.aliucord.utils.RxUtils.createActionSubscriber
 import com.aliucord.utils.RxUtils.subscribe
-import com.aliucord.api.SettingsAPI
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import java.net.URLEncoder
+import java.util.HashMap
 import com.aliucord.Logger;
 
 fun View.setMarginEnd(
@@ -52,7 +53,7 @@ fun View.setMarginEnd(
     this.layoutParams = params
 }
 
-class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet() {
+class EmbedModal(val channelId: Long, val plugin: SendEmbeds) : BottomSheet() {
     private val logger = Logger("SendEmbeds")
 
     @SuppressLint("SetTextI18n")
@@ -163,12 +164,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                             }
                         }
                         
-                        val modes = arrayListOf(
-                            "embed.rauf.workers.dev",
-                            "embed.rauf.wtf",
-                            "rauf.wtf/embed"
-                        )
-                        
+                        val modes = plugin.modes.toMutableList()
     
                         webhooks.keys.forEach {
                             modes.add("webhook: %s".format(it))
@@ -197,29 +193,15 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
                 try {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
-                            val mode = modeInput.editText?.text.toString()
-
-                            if (mode.startsWith("webhooks/")) {
-                                sendWebhookEmbed(
-                                    mode,
-                                    authorInput.editText?.text.toString(), 
-                                    titleInput.editText?.text.toString(), 
-                                    contentInput.editText?.text.toString(), 
-                                    urlInput.editText?.text.toString(), 
-                                    imageInput.editText?.text.toString(),
-                                    toColorInt(colorInput.editText?.text.toString())
-                                )
-                            } else {
-                                sendNonBotEmbed(
-                                    mode,
-                                    authorInput.editText?.text.toString(), 
-                                    titleInput.editText?.text.toString(), 
-                                    contentInput.editText?.text.toString(), 
-                                    urlInput.editText?.text.toString(), 
-                                    imageInput.editText?.text.toString(),
-                                    toColorInt(colorInput.editText?.text.toString())
-                                )
-                            }
+                            onSend(
+                                modeInput.editText?.text.toString(), 
+                                authorInput.editText?.text.toString(), 
+                                titleInput.editText?.text.toString(), 
+                                contentInput.editText?.text.toString(), 
+                                urlInput.editText?.text.toString(), 
+                                imageInput.editText?.text.toString(), 
+                                colorInput.editText?.text.toString()
+                            )
                         }
                     })
                 } catch (e: Throwable) {
@@ -274,7 +256,7 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
     }
 
     private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
-        val msg = if (settings.getBool("SendEmbeds_NQNCompatibility", true)) 
+        val msg = if (plugin.settings.getBool("SendEmbeds_NQNCompatibility", true)) 
             "[](https://%s/?author=%s&title=%s&description=%s&color=%06x&image=%s&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(imageUrl, "utf-8"), URLEncoder.encode(url, "utf-8"))
         else
             "https://%s/?author=%s&title=%s&description=%s&color=%06x&image=%s&redirect=%s".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(imageUrl, "utf-8"), URLEncoder.encode(url, "utf-8"))
@@ -295,7 +277,42 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
         RestAPI.api.sendMessage(channelId, message).subscribe(createActionSubscriber({ }))
     }
 
-    private fun toColorInt(a: String): Int {
+    private fun onSend(mode: String, author: String, title: String, content: String, url: String, imageUrl: String, color: String) {
+        if (plugin.extraFunctions.containsKey(mode)) {
+            plugin.extraFunctions.get(mode)?.invoke(
+                channelId,
+                author, 
+                title, 
+                content, 
+                url, 
+                imageUrl,
+                color
+            )
+        }
+        else if (mode.startsWith("webhooks/")) {
+            sendWebhookEmbed(
+                mode,
+                author, 
+                title, 
+                content, 
+                url, 
+                imageUrl,
+                toColorInt(color)
+            )
+        } else {
+            sendNonBotEmbed(
+                mode,
+                author, 
+                title, 
+                content, 
+                url, 
+                imageUrl,
+                toColorInt(color)
+            )
+        }
+    }
+
+    public fun toColorInt(a: String): Int {
         try {
             return a
                 .replace("#", "")
@@ -306,5 +323,4 @@ class EmbedModal(val channelId: Long, val settings: SettingsAPI) : BottomSheet()
         }
         return 0
     }
-
 }
