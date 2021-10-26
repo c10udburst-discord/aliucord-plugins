@@ -152,7 +152,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds) : BottomSheet() {
                         val perms = StoreStream.getPermissions()
                         if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
                             for(hook in getWebhooks()) {
-                                if (hook.token == null) break
+                                if (hook.token == null) continue
                                 var name = hook.name
                                 if (name == null) {
                                     name = hook.token
