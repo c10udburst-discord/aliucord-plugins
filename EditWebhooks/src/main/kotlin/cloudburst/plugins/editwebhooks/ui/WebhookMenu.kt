@@ -97,6 +97,7 @@ class WebhookMenu(
             setCompoundDrawablesRelativeWithIntrinsicBounds(sendEmbedIcon, null, null, null)
             setOnClickListener {
                 if (sendEmbeds != null) {
+                    dismiss()
                     val makeModal = ReflectUtils.getField(sendEmbeds, "makeModal") as ((Long, String?) -> AppBottomSheet)
                     makeModal.invoke(0L, "webhooks/%s/%s".format(webhook?.id, webhook?.token))
                         .show(parentFragmentManager, "SendEmbeds")

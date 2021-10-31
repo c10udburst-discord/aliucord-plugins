@@ -66,7 +66,7 @@ class EditWebhooks : Plugin() {
             patcher.patch(getDeclaredMethod("onViewBound", View::class.java), Hook { callFrame ->
                 val coordinatorLayout = (callFrame.args[0] as CoordinatorLayout)
                 val nestedScrollView = coordinatorLayout.getChildAt(1) as NestedScrollView
-                val linearLayout = (nestedScrollView.getChildAt(0) as LinearLayout).getChildAt(4) as LinearLayout
+                val linearLayout = nestedScrollView.findViewById(Utils.getResId("channel_settings_section_privacy_safety", "id")) as LinearLayout
                 val ctx = linearLayout.context
 
                 iconLeft?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
@@ -79,7 +79,7 @@ class EditWebhooks : Plugin() {
                     typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)
                 }
 
-                linearLayout.addView(editWebhooks, 0)
+                linearLayout.addView(editWebhooks)
                 Patcher.logger.info(linearLayout.toString())
 
             })
