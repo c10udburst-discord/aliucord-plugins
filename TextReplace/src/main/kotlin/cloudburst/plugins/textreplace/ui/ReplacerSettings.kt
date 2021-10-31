@@ -129,10 +129,14 @@ class ReplacerSettings : SettingsPage() {
 
     private fun updateRules(recycler: RecyclerView) {
         replacementRules.clear()
-        for (i in 0..recycler.adapter!!.itemCount) {
+        var i = 0;
+        while (true) {
             val holder = recycler.findViewHolderForLayoutPosition(i) as ReplacerHolder?
-            val replacement = holder?.card?.createReplacement()
+            if (holder == null) break
+            val replacement = holder.card.createReplacement()
             if (replacement != null) replacementRules.add(replacement)
+            i++
         }
     }
+
 }

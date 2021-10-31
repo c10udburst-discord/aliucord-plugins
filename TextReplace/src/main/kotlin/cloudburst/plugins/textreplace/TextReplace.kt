@@ -7,7 +7,6 @@ import com.aliucord.patcher.Patcher
 import com.aliucord.Utils
 import android.content.Context
 import android.widget.FrameLayout
-import com.discord.models.message.Message
 import com.aliucord.utils.ReflectUtils
 import com.aliucord.api.SettingsAPI
 
@@ -28,19 +27,32 @@ class TextReplace : Plugin() {
             Array<TextReplacement>::class.java
         )
 
-        with(Message::class.java) {
-            patcher.patch(getDeclaredMethod("getContent"), Hook { callFrame -> try {
-                var _this = callFrame.thisObject as Message?
-                val isSent = _this?.hit ?: false
-                var content = ReflectUtils.getField(_this!!, "content") as String
+        with(com.discord.api.message.Message::class.java) {
+            patcher.patch(getDeclaredMethod("i"), Hook { callFrame -> try {
+                var _this = callFrame.thisObject as com.discord.api.message.Message
+                var content = ReflectUtils.getField(_this, "content") as String
                 for (rule in TextReplace.replacementRules) {
-                    if (isSent and !rule.matchSent) continue
-                    if (!isSent and !rule.matchUnsent) continue
+                    if (!rule.matchSent) continue
                     if (rule.matches(content)) {
                         content = rule.replace(content)
                     }
                 }
                 callFrame.result = content
+            } catch (ignored: Throwable) {
+                Patcher.logger.error(ignored)
+            }})
+        }
+
+        with(com.discord.restapi.RestAPIParams.Message::class.java) {
+            patcher.patch(getConstructor(), Hook { callFrame -> try {
+                var _this = callFrame.thisObject as com.discord.api.message.Message
+                var content = ReflectUtils.getField(_this, "content") as String
+                for (rule in TextReplace.replacementRules) {
+                    if (!rule.matchUnsent) continue
+                    if (rule.matches(content)) {
+                        content = rule.replace(content)
+                    }
+                }
             } catch (ignored: Throwable) {
                 Patcher.logger.error(ignored)
             }})
