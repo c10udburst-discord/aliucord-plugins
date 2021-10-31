@@ -53,7 +53,7 @@ fun View.setMarginEnd(
     this.layoutParams = params
 }
 
-class EmbedModal(val channelId: Long, val plugin: SendEmbeds) : BottomSheet() {
+class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOverride: String?) : BottomSheet() {
     private val logger = Logger("SendEmbeds")
 
     @SuppressLint("SetTextI18n")
@@ -194,7 +194,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds) : BottomSheet() {
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
                             onSend(
-                                modeInput.editText?.text.toString(), 
+                                modeOverride ?: modeInput.editText?.text.toString(), 
                                 authorInput.editText?.text.toString(), 
                                 titleInput.editText?.text.toString(), 
                                 contentInput.editText?.text.toString(), 
@@ -218,7 +218,8 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds) : BottomSheet() {
         addView(urlInput)
         addView(imageInput)
         addView(colorInput)
-        addView(modeInput)
+        if (modeOverride == null)
+            addView(modeInput)
         addView(sendBtn)
     }
 

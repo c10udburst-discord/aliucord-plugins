@@ -25,6 +25,7 @@ import com.google.gson.JsonObject
 import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.analytics.AnalyticSuperProperties
 import com.aliucord.utils.ReflectUtils
+import com.aliucord.PluginManager
 import com.discord.stores.StoreStream
 import androidx.fragment.app.FragmentManager
 
@@ -46,9 +47,12 @@ class WebhookMenu(
         val layout = LinearLayout(context)
         layout.setBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorBackgroundPrimary))
 
+        val sendEmbeds = (if (PluginManager.isPluginEnabled("SendEmbeds")) PluginManager.plugins.get("SendEmbeds") else null)
+        
         val font = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
         val deleteIcon = ContextCompat.getDrawable(context, R.d.ic_delete_24dp)
         val copyIcon = ContextCompat.getDrawable(context, R.d.ic_copy_24dp)
+        val sendEmbedIcon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
         val avatarIcon = ContextCompat.getDrawable(context, R.d.ic_profile_24dp)
         val renameIcon = ContextCompat.getDrawable(context, R.d.ic_edit_24dp)
         val changeAvatarIcon = ContextCompat.getDrawable(context, R.d.ic_camera_24dp)
@@ -83,6 +87,20 @@ class WebhookMenu(
                 Utils.setClipboard("Webhook Url", webhook.url)
                 Utils.showToast("Webhook url copied to clipboard")
                 dismiss()
+            }
+            setClickable(true)
+            typeface = font
+        }
+
+        val sendEmbed = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+            text = "Send embed"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(sendEmbedIcon, null, null, null)
+            setOnClickListener {
+                if (sendEmbeds != null) {
+                    val makeModal = ReflectUtils.getField(sendEmbeds, "makeModal") as ((Long, String?) -> AppBottomSheet)
+                    makeModal.invoke(0L, "webhooks/%s/%s".format(webhook?.id, webhook?.token))
+                        .show(parentFragmentManager, "SendEmbeds")
+                }  
             }
             setClickable(true)
             typeface = font
@@ -138,10 +156,11 @@ class WebhookMenu(
             typeface = font
         }
 
-
         layout.addView(title)
-        if (webhook.type == 1)
+        if (webhook.token != null)
             layout.addView(copyWebhook)
+        if (webhook.token != null && sendEmbeds != null)
+            layout.addView(sendEmbed)
         if (webhook.avatar != null)
             layout.addView(viewAvatar)
         layout.addView(renameWebhook)

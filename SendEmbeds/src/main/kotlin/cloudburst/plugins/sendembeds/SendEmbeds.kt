@@ -29,17 +29,19 @@ import android.app.Activity
 import com.discord.utilities.color.ColorCompat
 import cloudburst.plugins.sendembeds.ui.SendEmbedsSettings
 import com.aliucord.fragments.AppFragmentProxy
+import com.aliucord.widgets.BottomSheet
 
 @AliucordPlugin
 class SendEmbeds : Plugin() {
     
-    //                                         channel,  author, title,  content, url,    imageUrl, color
+    //                                          channel,  author,   title, content, url,    imageUrl, color
     public val extraFunctions = hashMapOf<String, (Long,   String, String, String,  String, String,   String) -> Unit>()
     public val modes = mutableListOf(
         "embed.rauf.workers.dev",
         "embed.rauf.wtf",
         "rauf.wtf/embed"
     )
+    public val makeModal = ::createModal // bruh momento
 
     init {
         settingsTab = SettingsTab(SendEmbedsSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(this)
@@ -55,7 +57,7 @@ class SendEmbeds : Plugin() {
             "Send Embeds",
             emptyList()
         ) { ctx -> 
-            EmbedModal(ctx.getChannelId(), this).show(fragmentManager, "SendEmbeds")
+            createModal(ctx.getChannelId(), null).show(fragmentManager, "SendEmbeds")
             return@registerCommand null
         }
 
@@ -73,7 +75,7 @@ class SendEmbeds : Plugin() {
                             setBackgroundColor(0)
                             setOnClickListener {
                                 val channelId = StoreStream.getChannelsSelected().id
-                                EmbedModal(channelId, this@SendEmbeds).show(fragmentManager, "SendEmbeds")
+                                createModal(channelId, null).show(fragmentManager, "SendEmbeds")
                             }
                             setPadding(0, 0, 8, 0)
                             setClickable(true)
@@ -90,5 +92,9 @@ class SendEmbeds : Plugin() {
     override fun stop(context: Context) {
         commands.unregisterAll()
         patcher.unpatchAll()
+    }
+
+    public fun createModal(channelId: Long, modeOverride: String?) : BottomSheet {
+        return EmbedModal(channelId, this@SendEmbeds, modeOverride)
     }
 }
