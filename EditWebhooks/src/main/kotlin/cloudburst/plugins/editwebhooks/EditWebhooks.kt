@@ -36,8 +36,8 @@ import cloudburst.plugins.editwebhooks.ui.WebhookList
 class EditWebhooks : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val iconLeft = ContextCompat.getDrawable(context, R.d.ic_publish_24dp)
-        val iconRight = ContextCompat.getDrawable(context, R.d.icon_carrot)
+        val iconLeft = ContextCompat.getDrawable(context, R.e.ic_publish_24dp)
+        val iconRight = ContextCompat.getDrawable(context, R.e.icon_carrot)
         val editWebooksId = View.generateViewId()
 
         with(WidgetTextChannelSettings::class.java, {
@@ -72,7 +72,7 @@ class EditWebhooks : Plugin() {
                 iconLeft?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
                 iconRight?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
-                val editWebhooks = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+                val editWebhooks = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     text = "Edit Webhooks"
                     id = editWebooksId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(iconLeft, null, iconRight, null)

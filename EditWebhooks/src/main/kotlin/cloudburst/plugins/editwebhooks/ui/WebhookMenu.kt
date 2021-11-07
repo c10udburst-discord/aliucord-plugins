@@ -50,18 +50,18 @@ class WebhookMenu(
         val sendEmbeds = (if (PluginManager.isPluginEnabled("SendEmbeds")) PluginManager.plugins.get("SendEmbeds") else null)
         
         val font = ResourcesCompat.getFont(context, Constants.Fonts.whitney_medium)
-        val deleteIcon = ContextCompat.getDrawable(context, R.d.ic_delete_24dp)
-        val copyIcon = ContextCompat.getDrawable(context, R.d.ic_copy_24dp)
-        val sendEmbedIcon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
-        val avatarIcon = ContextCompat.getDrawable(context, R.d.ic_profile_24dp)
-        val renameIcon = ContextCompat.getDrawable(context, R.d.ic_edit_24dp)
-        val changeAvatarIcon = ContextCompat.getDrawable(context, R.d.ic_camera_24dp)
+        val deleteIcon = ContextCompat.getDrawable(context, R.e.ic_delete_24dp)
+        val copyIcon = ContextCompat.getDrawable(context, R.e.ic_copy_24dp)
+        val sendEmbedIcon = ContextCompat.getDrawable(context, R.e.ic_embed_white_24dp)
+        val avatarIcon = ContextCompat.getDrawable(context, R.e.ic_profile_24dp)
+        val renameIcon = ContextCompat.getDrawable(context, R.e.ic_edit_24dp)
+        val changeAvatarIcon = ContextCompat.getDrawable(context, R.e.ic_camera_24dp)
 
-        val title = TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply {
+        val title = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
             text = webhook.name
         }
         
-        val deleteWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val deleteWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "Delete"
             setCompoundDrawablesRelativeWithIntrinsicBounds(deleteIcon, null, null, null)
             setOnClickListener {
@@ -80,7 +80,7 @@ class WebhookMenu(
             typeface = font
         }
 
-        val copyWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val copyWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "Copy url"
             setCompoundDrawablesRelativeWithIntrinsicBounds(copyIcon, null, null, null)
             setOnClickListener {
@@ -92,7 +92,7 @@ class WebhookMenu(
             typeface = font
         }
 
-        val sendEmbed = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val sendEmbed = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "Send embed"
             setCompoundDrawablesRelativeWithIntrinsicBounds(sendEmbedIcon, null, null, null)
             setOnClickListener {
@@ -107,7 +107,7 @@ class WebhookMenu(
             typeface = font
         }
 
-        val viewAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val viewAvatar = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "View avatar"
             setCompoundDrawablesRelativeWithIntrinsicBounds(avatarIcon, null, null, null)
             setOnClickListener {
@@ -117,7 +117,7 @@ class WebhookMenu(
             typeface = font
         }
 
-        val renameWebhook = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val renameWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "Rename"
             setCompoundDrawablesRelativeWithIntrinsicBounds(renameIcon, null, null, null)
             setOnClickListener {
@@ -137,7 +137,7 @@ class WebhookMenu(
             typeface = font
         }
 
-        val setAvatar = TextView(context, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+        val setAvatar = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
             text = "Change avatar"
             setCompoundDrawablesRelativeWithIntrinsicBounds(changeAvatarIcon, null, null, null)
             setOnClickListener {

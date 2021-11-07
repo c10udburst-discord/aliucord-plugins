@@ -28,14 +28,10 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
             setPadding(p, p, p, p)
         }
 
-        fromInput = TextInput(ctx).apply { 
-            hint = "From"
-        }
+        fromInput = TextInput(ctx, "From")
         linearLayout.addView(fromInput)
 
-        replacementInput = TextInput(ctx).apply { 
-            hint = "To"
-        }
+        replacementInput = TextInput(ctx, "To")
         linearLayout.addView(replacementInput)
 
         isRegex = Utils.createCheckedSetting(
@@ -82,8 +78,8 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
     }
 
     public fun apply(replacement: TextReplacement) {
-        fromInput.editText?.setText(replacement.fromInput)
-        replacementInput.editText?.setText(replacement.replacement)
+        fromInput.editText.setText(replacement.fromInput)
+        replacementInput.editText.setText(replacement.replacement)
         isRegex.isChecked = replacement.isRegex
         ignoreCase.isChecked = replacement.ignoreCase
         matchUnsent.isChecked = replacement.matchUnsent
@@ -92,11 +88,11 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
     }
 
     public fun createReplacement(): TextReplacement? {
-        if ((fromInput.editText?.text.toString() == "") or (replacementInput.editText?.text.toString() == "")) return null
+        if ((fromInput.editText.text.toString() == "") or (replacementInput.editText.text.toString() == "")) return null
         try {
             return TextReplacement(
-                fromInput.editText?.text.toString(),
-                replacementInput.editText?.text.toString(),
+                fromInput.editText.text.toString(),
+                replacementInput.editText.text.toString(),
                 isRegex.isChecked,
                 ignoreCase.isChecked,
                 matchUnsent.isChecked,

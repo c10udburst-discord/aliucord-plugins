@@ -1,2 +1,2 @@
-version = "1.1.4"
+version = "1.1.6"
 description = "Edit Webhooks."

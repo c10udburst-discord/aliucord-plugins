@@ -19,12 +19,8 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
         val p = DimenUtils.defaultPadding
 
         val linearLayout = com.aliucord.widgets.LinearLayout(ctx).apply {
-            regex = TextInput(ctx).apply { 
-                hint = "From Regex"
-            }
-            toDomain = TextInput(ctx).apply { 
-                hint = "To Domain"
-            }
+            regex = TextInput(ctx, "From Regex")
+            toDomain = TextInput(ctx, "To Domain")
     
             addView(regex)
             addView(toDomain)

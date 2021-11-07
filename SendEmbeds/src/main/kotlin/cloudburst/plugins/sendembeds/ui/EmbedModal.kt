@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import android.text.TextWatcher
+import android.text.Editable
 import com.aliucord.widgets.BottomSheet
 import com.aliucord.widgets.LinearLayout
 import com.aliucord.views.TextInput
@@ -42,7 +44,8 @@ import com.aliucord.utils.RxUtils.subscribe
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import java.net.URLEncoder
 import java.util.HashMap
-import com.aliucord.Logger;
+import com.aliucord.Logger
+
 
 fun View.setMarginEnd(
     value: Int
@@ -54,6 +57,13 @@ fun View.setMarginEnd(
 }
 
 class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOverride: String?) : BottomSheet() {
+
+    class EmptyTextWatcher(): TextWatcher {
+        override public fun afterTextChanged(s: Editable) { }
+        override public fun beforeTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) { }
+        override public fun onTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) { }
+    }
+
     private val logger = Logger("SendEmbeds")
 
     @SuppressLint("SetTextI18n")
@@ -64,9 +74,8 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
         val p = padding / 2;
         this.setPadding(padding)
 
-        val authorInput = TextInput(context).apply { 
-            hint = "Author"
-            editText?.apply {
+        val authorInput = TextInput(context, "Author").apply { 
+            editText.apply {
                 setText(StoreStream.getUsers().me.username)
                 inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or EditorInfo.TYPE_CLASS_TEXT)
                 imeOptions = EditorInfo.IME_ACTION_NEXT
@@ -74,18 +83,16 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
             setMarginEnd(p)
         }
         
-        val titleInput = TextInput(context).apply { 
-            hint = "Title"
-            editText?.apply { 
+        val titleInput = TextInput(context, "Title").apply { 
+            editText.apply { 
                 inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or EditorInfo.TYPE_CLASS_TEXT)
                 imeOptions = EditorInfo.IME_ACTION_NEXT
             }
             setMarginEnd(p)
         }
 
-        val contentInput = TextInput(context).apply { 
-            hint = "Content"
-            editText?.apply { 
+        val contentInput = TextInput(context, "Content").apply { 
+            editText.apply { 
                 maxLines = Int.MAX_VALUE
                 inputType = (EditorInfo.TYPE_TEXT_FLAG_AUTO_COMPLETE or 
                     EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE or 
@@ -96,19 +103,16 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
             setMarginEnd(p)
         }
         
-        val urlInput = TextInput(context).apply { 
-            hint = "Url"
-            editText?.apply {
+        val urlInput = TextInput(context, "Url").apply { 
+            editText.apply {
                 inputType = (EditorInfo.TYPE_TEXT_VARIATION_URI or EditorInfo.TYPE_CLASS_TEXT)
                 imeOptions = EditorInfo.IME_ACTION_NEXT
             }
             setMarginEnd(p)
         }
         
-        val colorInput = TextInput(context).apply { 
-            editText?.setText("#738ADB")
-            hint = "Color"
-            editText?.apply { 
+        val colorInput = TextInput(context, "Color", "#%06X".format(ColorCompat.getThemedColor(context, R.b.colorAccent) and 0x00FFFFFF), EmptyTextWatcher()).apply { 
+            editText.apply { 
                 inputType = EditorInfo.TYPE_NULL
                 setOnClickListener {
                     val builder = ColorPickerUtils.INSTANCE.buildColorPickerDialog(
@@ -120,7 +124,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
                         override fun onColorReset(i: Int) { }
 
                         override fun onColorSelected(i: Int, i2: Int) {
-                            editText?.setText("#%06X".format(i2 and 0x00FFFFFF)) // remove alpha component
+                            editText.setText("#%06X".format(i2 and 0x00FFFFFF)) // remove alpha component
                         }
 
                         override fun onDialogDismissed(i: Int) { }
@@ -132,57 +136,53 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
             setMarginEnd(p)
         }
 
-        val imageInput = TextInput(context).apply { 
-            hint = "Image Url"
-            editText?.apply {
+        val imageInput = TextInput(context, "Image Url").apply { 
+            editText.apply {
                 inputType = (EditorInfo.TYPE_TEXT_VARIATION_URI or EditorInfo.TYPE_CLASS_TEXT)
                 imeOptions = EditorInfo.IME_ACTION_NEXT
             }
             setMarginEnd(p)
         }
 
-        val modeInput = TextInput(context).apply { 
-            editText?.setText("embed.rauf.workers.dev")
-            hint = "Mode"
-            editText?.apply { 
-                inputType = EditorInfo.TYPE_NULL
-                setOnClickListener {
-                    Utils.threadPool.execute({
-                        val webhooks = HashMap<String, Webhook>()
-                        val perms = StoreStream.getPermissions()
-                        if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
-                            for(hook in getWebhooks()) {
-                                if (hook.token == null) continue
-                                var name = hook.name
-                                if (name == null) {
-                                    name = hook.token
-                                }
-                                while (webhooks.containsKey(name)) {
-                                    name += "."
-                                }
-                                webhooks.put(name, hook)
+        val modeInput = Button(context).apply { 
+            text = "embed.rauf.workers.dev"
+            setBackgroundColor(ColorCompat.getThemedColor(view.getContext(), R.b.colorBackgroundTertiary))
+            setOnClickListener {
+                Utils.threadPool.execute({
+                    val webhooks = HashMap<String, Webhook>()
+                    val perms = StoreStream.getPermissions()
+                    if (PermissionUtils.can(Permission.MANAGE_WEBHOOKS, perms.permissionsByChannel.get(channelId))) {
+                        for(hook in getWebhooks()) {
+                            if (hook.token == null) continue
+                            var name = hook.name
+                            if (name == null) {
+                                name = hook.token
                             }
-                        }
-                        
-                        val modes = plugin.modes.toMutableList()
-    
-                        webhooks.keys.forEach {
-                            modes.add("webhook: %s".format(it))
-                        }
-                        
-                        val modeSelector = ModeSelector(modes, {mode -> 
-                            if (mode.startsWith("webhook: ")) {
-                                val hook = webhooks.get(mode.drop(9))
-                                this.setText("webhooks/%s/%s".format(hook?.id, hook?.token))
-                            } else {
-                                this.setText(mode)
+                            while (webhooks.containsKey(name)) {
+                                name += "."
                             }
-                        })
-                        modeSelector.show(parentFragmentManager, "Embed Mode")
-                        
-                    })
+                            webhooks.put(name, hook)
+                        }
+                    }
+                    
+                    val modes = plugin.modes.toMutableList()
 
-                }
+                    webhooks.keys.forEach {
+                        modes.add("webhook: %s".format(it))
+                    }
+                    
+                    val modeSelector = ModeSelector(modes, {mode -> 
+                        if (mode.startsWith("webhook: ")) {
+                            val hook = webhooks.get(mode.drop(9))
+                            this.setText("webhooks/%s/%s".format(hook?.id, hook?.token))
+                        } else {
+                            this.setText(mode)
+                        }
+                    })
+                    modeSelector.show(parentFragmentManager, "Embed Mode")
+                    
+                })
+
             }
             setMarginEnd(p)
         }
@@ -194,13 +194,13 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
                     Utils.threadPool.execute(object : Runnable {
                         override fun run() {
                             onSend(
-                                modeOverride ?: modeInput.editText?.text.toString(), 
-                                authorInput.editText?.text.toString(), 
-                                titleInput.editText?.text.toString(), 
-                                contentInput.editText?.text.toString(), 
-                                urlInput.editText?.text.toString(), 
-                                imageInput.editText?.text.toString(), 
-                                colorInput.editText?.text.toString()
+                                modeOverride ?: modeInput.text.toString(), 
+                                authorInput.editText.text.toString(), 
+                                titleInput.editText.text.toString(), 
+                                contentInput.editText.text.toString(), 
+                                urlInput.editText.text.toString(), 
+                                imageInput.editText.text.toString(), 
+                                colorInput.editText.text.toString()
                             )
                         }
                     })

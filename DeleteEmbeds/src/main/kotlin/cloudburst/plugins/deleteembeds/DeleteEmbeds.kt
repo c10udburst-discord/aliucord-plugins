@@ -32,7 +32,7 @@ import com.discord.utilities.analytics.AnalyticSuperProperties
 class DeleteEmbeds : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_clear_24dp)
+        val icon = ContextCompat.getDrawable(context, R.e.ic_clear_24dp)
         val deleteEmbedId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
@@ -78,7 +78,7 @@ class DeleteEmbeds : Plugin() {
 
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
-                val deleteEmbed = TextView(ctx, null, 0, R.h.UiKit_Settings_Item_Icon).apply {
+                val deleteEmbed = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     text = "Delete Embed"
                     id = deleteEmbedId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)

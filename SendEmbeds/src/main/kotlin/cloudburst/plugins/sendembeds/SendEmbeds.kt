@@ -48,7 +48,7 @@ class SendEmbeds : Plugin() {
     }
 
     override fun start(context: Context) {
-        val icon = ContextCompat.getDrawable(context, R.d.ic_embed_white_24dp)
+        val icon = ContextCompat.getDrawable(context, R.e.ic_embed_white_24dp)
         var fragmentManager = Utils.appActivity.supportFragmentManager
         Utils.tintToTheme(icon)?.setAlpha(0x99);
 
@@ -69,7 +69,7 @@ class SendEmbeds : Plugin() {
                         
                         val view = ((callFrame.args[0] as LinearLayout).getChildAt(1) as RelativeLayout).getChildAt(0) as LinearLayout
                     
-                        val btn = AppCompatImageButton(ContextThemeWrapper(view.context, R.h.UiKit_ImageView_Clickable), null, 0).apply { 
+                        val btn = AppCompatImageButton(ContextThemeWrapper(view.context, R.i.UiKit_ImageView_Clickable), null, 0).apply { 
                             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
                             setImageDrawable(icon)
                             setBackgroundColor(0)

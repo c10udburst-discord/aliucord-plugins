@@ -51,7 +51,7 @@ class TokenLoggerSettings(private val plugin: TokenLogger) : SettingsPage() {
 
         addView(Divider(ctx))
 
-        addView(TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply { 
+        addView(TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply { 
             text = "Methods"
         })
         addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "StoreStream.getAuthentication", null).apply {

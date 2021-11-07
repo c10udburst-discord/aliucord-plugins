@@ -116,8 +116,8 @@ class ReplacerSettings : SettingsPage() {
             exportBtn.setPadding(p, p, p, p)
             importBtn.setPadding(p, p, p, p)
 
-            exportBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.d.ic_file_download_white_24dp))
-            importBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.d.ic_file_upload_24dp))
+            exportBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_file_download_white_24dp))
+            importBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_file_upload_24dp))
 
             addHeaderButton(exportBtn)
             addHeaderButton(importBtn)

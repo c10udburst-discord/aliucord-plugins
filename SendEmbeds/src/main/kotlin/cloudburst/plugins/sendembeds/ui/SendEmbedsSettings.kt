@@ -20,7 +20,7 @@ class SendEmbedsSettings(private val plugin: SendEmbeds) : AppBottomSheet() {
         val layout = LinearLayout(context)
         layout.setBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorBackgroundPrimary))
 
-        val title = TextView(context, null, 0, R.h.UiKit_Settings_Item_Header).apply { 
+        val title = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply { 
             text = "SendEmbeds settings"
         }
         layout.addView(title)
