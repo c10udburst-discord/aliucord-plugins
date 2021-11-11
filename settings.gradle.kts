@@ -7,8 +7,8 @@ project(":EditWebhooks").projectDir = File("./EditWebhooks")
 include(":HighlightOwnMessages")
 project(":HighlightOwnMessages").projectDir = File("./HighlightOwnMessages")
 
-include(":LinkReplace")
-project(":LinkReplace").projectDir = File("./LinkReplace")
+include(":TextReplace")
+project(":TextReplace").projectDir = File("./TextReplace")
 
 include(":SendEmbeds")
 project(":SendEmbeds").projectDir = File("./SendEmbeds")

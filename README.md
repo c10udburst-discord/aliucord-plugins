@@ -10,8 +10,8 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 - [HighlightOwnMessages](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/HighlightOwnMessages.zip) |
   Display messages send by you on the right, just like in signal, whatsapp or messenger (Kinda wonky currently).
   
-- [LinkReplace](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/LinkReplace.zip) |
-  Replace popular internet platforms' links with alternative open source front-ends.
+- [TextReplace](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/TextReplace.zip) |
+  Customizable text replacer.
   
 - [SendEmbeds](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/SendEmbeds.zip) |
   Adds a `/embed` command and a button  which opens an ui which can be used to send embeds (using links and webhooks).

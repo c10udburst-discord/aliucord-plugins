@@ -61,7 +61,7 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
         matchSent = Utils.createCheckedSetting(
             ctx,
             CheckedSetting.ViewType.SWITCH,
-            "Match unsent",
+            "Match sent",
             "Whether to match sent messages"
         )
         linearLayout.addView(matchSent)
