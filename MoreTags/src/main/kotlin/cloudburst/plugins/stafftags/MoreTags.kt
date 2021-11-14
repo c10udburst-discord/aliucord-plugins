@@ -20,6 +20,8 @@ import com.discord.utilities.permissions.PermissionUtils
 import android.widget.TextView
 import android.graphics.Color
 import com.discord.api.permission.*
+import com.lytefast.flexinput.R
+import com.discord.utilities.color.ColorCompat
 
 @AliucordPlugin
 class MoreTags : Plugin() {
@@ -50,14 +52,12 @@ class MoreTags : Plugin() {
 
                 val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
                 if (member == null) return@Hook;
+
                 val tagStr = getTag(channel.guildId, member)
-                if (tagStr != null) {
-                    tag.apply {
-                        text = tagStr;
-                        visibility = View.VISIBLE
-                        background.setTint(member.color)
-                        setTextColor(contrastColor(member.color))
-                    }
+                if (tagStr == null) return@Hook;
+                tag.apply {
+                    text = tagStr;
+                    visibility = View.VISIBLE
                 }
 
             } catch (ignored: Throwable) {
