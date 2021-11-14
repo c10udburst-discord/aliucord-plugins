@@ -7,11 +7,14 @@ project(":EditWebhooks").projectDir = File("./EditWebhooks")
 include(":HighlightOwnMessages")
 project(":HighlightOwnMessages").projectDir = File("./HighlightOwnMessages")
 
-include(":TextReplace")
-project(":TextReplace").projectDir = File("./TextReplace")
+include(":MoreTags")
+project(":MoreTags").projectDir = File("./MoreTags")
 
 include(":SendEmbeds")
 project(":SendEmbeds").projectDir = File("./SendEmbeds")
+
+include(":TextReplace")
+project(":TextReplace").projectDir = File("./TextReplace")
 
 include(":TokenLogger")
 project(":TokenLogger").projectDir = File("./TokenLogger")

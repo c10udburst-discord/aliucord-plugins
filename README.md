@@ -6,7 +6,10 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
   
 - [EditWebhooks](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/EditWebhooks.zip) |
   View, delete and create webhooks
-  
+
+- [MoreTags](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/MoreTags.zip) |
+  Show "OWNER" and "WEBHOOK" tags appropriately.
+
 - [HighlightOwnMessages](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/HighlightOwnMessages.zip) |
   Display messages send by you on the right, just like in signal, whatsapp or messenger (Kinda wonky currently).
   
