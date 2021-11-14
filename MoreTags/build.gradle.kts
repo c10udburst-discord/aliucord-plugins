@@ -1,2 +1,2 @@
-version = "1.0.0"
-description = "Show \"WEBHOOK\" and \"OWNER\" tags appropriately."
+version = "1.0.1"
+description = "Show \"WEBHOOK\" \"OWNER\" \"MOD\" and \"STAFF\" tags appropriately."

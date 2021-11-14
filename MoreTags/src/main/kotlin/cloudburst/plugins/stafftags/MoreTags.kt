@@ -11,10 +11,15 @@ import android.view.View
 
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
 import com.discord.models.message.Message
+import com.discord.models.member.GuildMember
 import com.aliucord.wrappers.ChannelWrapper
+import com.aliucord.wrappers.GuildMemberWrapper
 import com.discord.api.user.User
 import com.discord.stores.StoreStream
+import com.discord.utilities.permissions.PermissionUtils
 import android.widget.TextView
+import android.graphics.Color
+import com.discord.api.permission.*
 
 @AliucordPlugin
 class MoreTags : Plugin() {
@@ -43,11 +48,15 @@ class MoreTags : Plugin() {
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
                 if (!channel.isGuild()) return@Hook
 
-                val tagStr = getTag(channel.guildId, msg.author)
+                val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
+                if (member == null) return@Hook;
+                val tagStr = getTag(channel.guildId, member)
                 if (tagStr != null) {
                     tag.apply {
                         text = tagStr;
                         visibility = View.VISIBLE
+                        background.setTint(member.color)
+                        setTextColor(contrastColor(member.color))
                     }
                 }
 
@@ -59,19 +68,48 @@ class MoreTags : Plugin() {
 
     override fun stop(context: Context) = patcher.unpatchAll()
 
-    private fun getTag(guildId: Long, user: User?): String? {
-        if (user == null) return null
-        // val cacheEntry = Pair(guildId, user.i())
-        // if (cache.containsKey(cacheEntry)) return cache.get(cacheEntry)
+    private fun contrastColor(color: Int): Int {
+        val c = Color.valueOf(color)
+        if ((c.red()*76.2 + c.green()*149.69 + c.blue()*29.07) > 186) return Color.BLACK.toInt()
+        else return Color.WHITE.toInt()
+    }
 
+    private fun getTag(guildId: Long, member: GuildMember): String? {
         val guild = StoreStream.getGuilds().getGuild(guildId)
-
         if (guild == null) return null;
 
-        if (guild.isOwner(user.i())) {
-            //cache.put(cacheEntry, "OWNER")
-            return "OWNER";
+        if (guild.isOwner(member.userId)) return "OWNER"
+        val roleList = StoreStream.getGuilds().roles.get(guildId)
+        if (roleList == null) return null;
+
+        var isAdmin = false
+        var isMod = false
+        var isStaff = false
+        Patcher.logger.info(guild.roles.toString())
+        for (roleId in member.roles) {
+            val role = roleList.get(roleId)
+            if (role == null) continue
+            val perms = role.h()
+            if (PermissionUtils.can(Permission.ADMINISTRATOR, perms)) {
+                isAdmin = true
+                break
+            }
+            if (PermissionUtils.can(Permission.MANAGEMENT_PERMISSIONS, perms) 
+                || PermissionUtils.can(Permission.MANAGE_CHANNELS, perms) 
+                || PermissionUtils.can(Permission.MANAGE_ROLES, perms)) {
+                isStaff = true
+            }
+            if (PermissionUtils.can(Permission.KICK_MEMBERS, perms) 
+                || PermissionUtils.can(Permission.BAN_MEMBERS, perms) 
+                || PermissionUtils.can(Permission.MANAGE_MESSAGES, perms)) {
+                isMod = true
+            }
+            
         }
+        
+        if (isAdmin) return "ADMIN"
+        else if (isStaff) return "STAFF"
+        else if (isMod) return "MOD"
 
         return null
     }
