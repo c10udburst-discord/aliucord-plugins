@@ -40,7 +40,8 @@ class TextReplace : Plugin() {
         with(com.discord.api.message.Message::class.java) {
             patcher.patch(getDeclaredMethod("i"), Hook { callFrame -> try {
                 var _this = callFrame.thisObject as com.discord.api.message.Message
-                var content = ReflectUtils.getField(_this, "content") as String
+                var content = ReflectUtils.getField(_this, "content") as String? ?:""
+                if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchSent) continue
                     if (rule.matches(content)) {
@@ -56,8 +57,10 @@ class TextReplace : Plugin() {
         with(com.discord.widgets.chat.input.ChatInputViewModel::class.java) {
             patcher.patch(getDeclaredMethod("sendMessage", Context::class.java, MessageManager::class.java, MessageContent::class.java, List::class.java, Boolean::class.javaPrimitiveType, Function1::class.java), PreHook { callFrame -> try {
                 //val isNitro = StoreStream.getUsers().me.premiumTier == PremiumTier.TIER_2
-                val messageContent = callFrame.args[2] as MessageContent
-                var content = textContentField.get(messageContent) as String
+                val messageContent = callFrame.args[2] as MessageContent?
+                if (messageContent == null) return@PreHook
+                var content = textContentField.get(messageContent) as String? ?:""
+                if (content == "") return@PreHook
                 Patcher.logger.info(content)
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchUnsent) continue
@@ -75,21 +78,8 @@ class TextReplace : Plugin() {
         with(com.discord.api.message.embed.MessageEmbed::class.java) {
             patcher.patch(getDeclaredMethod("j"), Hook { callFrame -> try {
                 var _this = callFrame.thisObject as com.discord.api.message.embed.MessageEmbed
-                var content = ReflectUtils.getField(_this, "title") as String
-                for (rule in TextReplace.replacementRules) {
-                    if (!rule.matchEmbeds) continue
-                    if (rule.matches(content)) {
-                        content = rule.replace(content)
-                    }
-                }
-                callFrame.result = content
-            } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
-            }})
-
-            patcher.patch(getDeclaredMethod("e"), Hook { callFrame -> try {
-                var _this = callFrame.thisObject as com.discord.api.message.embed.MessageEmbed
-                var content = ReflectUtils.getField(_this, "footer") as String
+                var content = ReflectUtils.getField(_this, "title") as String? ?:""
+                if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchEmbeds) continue
                     if (rule.matches(content)) {
@@ -103,7 +93,8 @@ class TextReplace : Plugin() {
 
             patcher.patch(getDeclaredMethod("c"), Hook { callFrame -> try {
                 var _this = callFrame.thisObject as com.discord.api.message.embed.MessageEmbed
-                var content = ReflectUtils.getField(_this, "description") as String
+                var content = ReflectUtils.getField(_this, "description") as String? ?:""
+                if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchEmbeds) continue
                     if (rule.matches(content)) {
