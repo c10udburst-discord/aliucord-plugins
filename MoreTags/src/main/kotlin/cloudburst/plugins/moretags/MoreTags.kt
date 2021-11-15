@@ -46,7 +46,7 @@ class MoreTags : Plugin() {
                 val msg = callFrame.args[0] as Message
 
                 if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null && msg.author.f() == "0000") {
-                    val bgColor = ColorCompat.getThemedColor(context, R.b.color_brand)
+                    val bgColor = ColorCompat.getColor(context, R.c.brand_new_500)
                     tag.apply {
                         text = "WEBHOOK";
                         visibility = View.VISIBLE
