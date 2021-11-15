@@ -68,14 +68,12 @@ class MoreTags : Plugin() {
                     }
                 }
 
-                val tagStr = if (msg.author.e() == true && settings.getBool("MoreTags_BotOnly", false)) "BOT" 
-                else if (msg.author.e() == true) "BOT • ${getTag(channel.guildId, member)}"
-                else getTag(channel.guildId, member)
-                
-                if (tagStr == null) return@Hook;
+                val tagStr = getTag(channel.guildId, member)
                 tag.apply {
-                    text =  tagStr
-                    visibility = View.VISIBLE
+                    text =  if (msg.author.e() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                    else if (msg.author.e() == true) "BOT • ${tagStr}"
+                    else tagStr ?: ""
+                    visibility = if (text == "") View.GONE else View.VISIBLE
                 }
 
             } catch (ignored: Throwable) {
