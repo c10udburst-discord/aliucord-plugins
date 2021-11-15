@@ -39,8 +39,7 @@ class SendEmbeds : Plugin() {
     public val modes = mutableListOf(
         "embed.rauf.workers.dev",
         "embed.rauf.wtf",
-        "rauf.wtf/embed",
-        "test"
+        "rauf.wtf/embed"
     )
     public val makeModal = ::createModal // bruh momento
 
@@ -60,7 +59,7 @@ class SendEmbeds : Plugin() {
         ) { ctx -> 
             createModal(ctx.getChannelId(), null).show(fragmentManager, "SendEmbeds")
             return@registerCommand null
-        }
+        }se
 
         with(FlexInputFragment::class.java, { 
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame -> 

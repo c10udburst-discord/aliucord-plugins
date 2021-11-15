@@ -32,6 +32,13 @@ class SendEmbedsSettings(private val plugin: SendEmbeds) : AppBottomSheet() {
                 plugin.settings.setBool(key, it)
             }
         })
+        layout.addView(Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Hide embed link", "Sends links with hidden glitch. Note: Only hides on web/pc").apply {
+            val key = "SendEmbeds_LinkVisible"
+            isChecked = plugin.settings.getBool(key, false)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
         layout.addView(Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "NQN compatibility", "Sends links with markdown syntax, so NQN will convert them to webhooks without links visible").apply {
             val key = "SendEmbeds_NQNCompatibility"
             isChecked = plugin.settings.getBool(key, true)
