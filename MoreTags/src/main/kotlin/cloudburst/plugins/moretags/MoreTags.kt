@@ -7,6 +7,7 @@ import com.aliucord.patcher.PreHook
 import com.aliucord.patcher.Patcher
 import com.aliucord.Utils
 import android.content.Context
+import androidx.core.content.ContextCompat
 import android.view.View
 
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
@@ -23,10 +24,15 @@ import com.discord.api.permission.*
 import com.lytefast.flexinput.R
 import com.discord.utilities.color.ColorCompat
 
+import cloudburst.plugins.moretags.ui.MoreTagsSettings
+
 @AliucordPlugin
 class MoreTags : Plugin() {
 
     //val cache: HashMap<Pair<Long, Long>, String?> = hashMapOf();
+    init {
+        settingsTab = SettingsTab(MoreTagsSettings::class.java, SettingsTab.Type.PAGE).withArgs(this.settings)
+    }
 
     override fun start(context: Context) {
         with(WidgetChatListAdapterItemMessage::class.java) { 
@@ -39,24 +45,36 @@ class MoreTags : Plugin() {
 
                 val msg = callFrame.args[0] as Message
 
-                if (msg.webhookId != null && msg.author.f() == "0000") {
+                if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null && msg.author.f() == "0000") {
+                    val bgColor = ColorCompat.getThemedColor(context, R.b.color_brand)
                     tag.apply {
                         text = "WEBHOOK";
                         visibility = View.VISIBLE
+                        background.setTint(bgColor)
+                        setTextColor(contrastColor(bgColor))
                     }
                     return@Hook
                 }
 
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
                 if (!channel.isGuild()) return@Hook
-
+            
                 val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
                 if (member == null) return@Hook;
+                if (settings.getBool("MoreTags_Colorize", true)) {
+                    tag.apply { 
+                        background.setTint(member.color)
+                        setTextColor(contrastColor(member.color))
+                    }
+                }
 
-                val tagStr = getTag(channel.guildId, member)
+                val tagStr = if (msg.author.e() == true && settings.getBool("MoreTags_BotOnly", false)) "BOT" 
+                else if (msg.author.e() == true) "BOT • ${getTag(channel.guildId, member)}"
+                else getTag(channel.guildId, member)
+                
                 if (tagStr == null) return@Hook;
                 tag.apply {
-                    text = tagStr;
+                    text =  tagStr
                     visibility = View.VISIBLE
                 }
 
@@ -75,8 +93,13 @@ class MoreTags : Plugin() {
     }
 
     private fun getTag(guildId: Long, member: GuildMember): String? {
+        val checkAdmin = settings.getBool("MoreTags_Admin", true)
+        val checkStaff = settings.getBool("MoreTags_Staff", true)
+        val checkMod = settings.getBool("MoreTags_Mod", true)
+        if (!(checkAdmin || checkStaff || checkMod)) return null
+
         val guild = StoreStream.getGuilds().getGuild(guildId)
-        if (guild == null) return null;
+        if (guild == null) return null
 
         if (guild.isOwner(member.userId)) return "OWNER"
         val roleList = StoreStream.getGuilds().roles.get(guildId)
@@ -90,7 +113,7 @@ class MoreTags : Plugin() {
             val role = roleList.get(roleId)
             if (role == null) continue
             val perms = role.h()
-            if (PermissionUtils.can(Permission.ADMINISTRATOR, perms)) {
+            if (checkAdmin && PermissionUtils.can(Permission.ADMINISTRATOR, perms)) {
                 isAdmin = true
                 break
             }
@@ -107,9 +130,9 @@ class MoreTags : Plugin() {
             
         }
         
-        if (isAdmin) return "ADMIN"
-        else if (isStaff) return "STAFF"
-        else if (isMod) return "MOD"
+        if (checkAdmin && isAdmin) return "ADMIN"
+        else if (checkStaff && isStaff) return "STAFF"
+        else if (checkMod && isMod) return "MOD"
 
         return null
     }
