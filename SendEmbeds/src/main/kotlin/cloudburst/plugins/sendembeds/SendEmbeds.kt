@@ -39,7 +39,8 @@ class SendEmbeds : Plugin() {
     public val modes = mutableListOf(
         "embed.rauf.workers.dev",
         "embed.rauf.wtf",
-        "rauf.wtf/embed"
+        "rauf.wtf/embed",
+        "test"
     )
     public val makeModal = ::createModal // bruh momento
 
