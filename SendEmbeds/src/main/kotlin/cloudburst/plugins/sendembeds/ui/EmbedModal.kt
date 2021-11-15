@@ -257,6 +257,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
     }
 
     private fun sendNonBotEmbed(site: String, author: String, title: String, content: String, url: String, imageUrl: String, color: Int) {
+        val msg: String
         if (plugin.settings.getBool("SendEmbeds_NQNCompatibility", true)) {
             val msg = "[](https://%s/?author=%s&title=%s&description=%s&color=%06x&image=%s&redirect=%s)".format(site, URLEncoder.encode(author, "utf-8"), URLEncoder.encode(title, "utf-8"), URLEncoder.encode(content, "utf-8"), color, URLEncoder.encode(imageUrl, "utf-8"), URLEncoder.encode(url, "utf-8"))
         }
