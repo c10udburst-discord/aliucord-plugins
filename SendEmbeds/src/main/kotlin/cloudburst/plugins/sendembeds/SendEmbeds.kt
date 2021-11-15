@@ -59,7 +59,7 @@ class SendEmbeds : Plugin() {
         ) { ctx -> 
             createModal(ctx.getChannelId(), null).show(fragmentManager, "SendEmbeds")
             return@registerCommand null
-        }se
+        }
 
         with(FlexInputFragment::class.java, { 
             patcher.patch(getDeclaredMethod("onViewCreated", View::class.java, Bundle::class.java), Hook { callFrame -> 
