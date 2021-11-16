@@ -23,7 +23,7 @@ class MoreTagsSettings(private val settings: SettingsAPI) : SettingsPage() {
                 settings.setBool(key, it)
             }
         })
-        addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "Webhook", "Rename \"BOT\" to \"WEBHOOK\" when appropriate.").apply {
+        addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "Webhook", "Rename \"BOT\" to \"WEBHOOK\" or \"SERVER\" when appropriate.").apply {
             val key = "MoreTags_Webhook"
             isChecked = settings.getBool(key, true)
             setOnCheckedListener {
