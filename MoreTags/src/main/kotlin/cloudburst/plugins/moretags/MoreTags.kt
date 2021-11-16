@@ -48,7 +48,8 @@ class MoreTags : Plugin() {
                 if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null && msg.author.f() == "0000") {
                     val bgColor = ColorCompat.getColor(context, R.c.brand_new_500)
                     tag.apply {
-                        text = "WEBHOOK";
+                        // https://discord.com/developers/docs/resources/channel#message-object-message-flags
+                        text = if ((msg.flags and 2) > 0) "SERVER" else "WEBHOOK"
                         visibility = View.VISIBLE
                         background.setTint(bgColor)
                         setTextColor(contrastColor(bgColor))
