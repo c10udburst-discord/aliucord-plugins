@@ -80,8 +80,6 @@ class EditWebhooks : Plugin() {
                 }
 
                 linearLayout.addView(editWebhooks)
-                Patcher.logger.info(linearLayout.toString())
-
             })
         })
     }
