@@ -106,7 +106,6 @@ class MoreTags : Plugin() {
         var isAdmin = false
         var isMod = false
         var isStaff = false
-        Patcher.logger.info(guild.roles.toString())
         for (roleId in member.roles) {
             val role = roleList.get(roleId)
             if (role == null) continue
