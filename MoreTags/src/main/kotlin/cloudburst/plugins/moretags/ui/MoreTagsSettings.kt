@@ -37,6 +37,13 @@ class MoreTagsSettings(private val settings: SettingsAPI) : SettingsPage() {
                 settings.setBool(key, it)
             }
         })
+        addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "Owner", "Show \"OWNER\" tags.").apply {
+            val key = "MoreTags_Owner"
+            isChecked = settings.getBool(key, true)
+            setOnCheckedListener {
+                settings.setBool(key, it)
+            }
+        })
         addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "Administrator", "Show \"ADMIN\" tags.").apply {
             val key = "MoreTags_Admin"
             isChecked = settings.getBool(key, true)

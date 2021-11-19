@@ -14,6 +14,7 @@ import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage
 import com.discord.models.message.Message
 import com.discord.models.member.GuildMember
 import com.aliucord.wrappers.ChannelWrapper
+import com.aliucord.utils.ReflectUtils
 import com.aliucord.wrappers.GuildMemberWrapper
 import com.discord.api.user.User
 import com.discord.stores.StoreStream
@@ -23,6 +24,11 @@ import android.graphics.Color
 import com.discord.api.permission.*
 import com.lytefast.flexinput.R
 import com.discord.utilities.color.ColorCompat
+import com.discord.widgets.channels.memberlist.adapter.*
+import com.discord.databinding.WidgetChannelMembersListItemUserBinding
+import com.discord.widgets.user.profile.UserProfileHeaderView
+import com.discord.widgets.user.profile.UserProfileHeaderViewModel
+import com.discord.databinding.UserProfileHeaderViewBinding
 
 import cloudburst.plugins.moretags.ui.MoreTagsSettings
 
@@ -35,7 +41,7 @@ class MoreTags : Plugin() {
     }
 
     override fun start(context: Context) {
-        with(WidgetChatListAdapterItemMessage::class.java) { 
+        with(WidgetChatListAdapterItemMessage::class.java) { // in chat
             patcher.patch(getDeclaredMethod("configureItemTag", Message::class.java), Hook { callFrame -> try {
                 val tag = getDeclaredField("itemTag").let {
                     it.isAccessible = true
@@ -62,9 +68,11 @@ class MoreTags : Plugin() {
                 val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
                 if (member == null) return@Hook;
                 if (settings.getBool("MoreTags_Colorize", true)) {
+                    val foreground = contrastColor(member.color)
                     tag.apply { 
                         background.setTint(member.color)
-                        setTextColor(contrastColor(member.color))
+                        setTextColor(foreground)
+                        getCompoundDrawables()[0]?.setTint(foreground)
                     }
                 }
 
@@ -80,26 +88,91 @@ class MoreTags : Plugin() {
                 Patcher.logger.error(ignored)
             }})
         }
+
+        with(ChannelMembersListViewHolderMember::class.java) { // in member list
+            patcher.patch(getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), Hook { callFrame -> try {
+                val layout = (ReflectUtils.getField(callFrame.thisObject, "binding") as WidgetChannelMembersListItemUserBinding).root
+                val user = callFrame.args[0] as ChannelMembersListAdapter.Item.Member
+                val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
+
+                val guildId = user.guildId
+                val member = StoreStream.getGuilds().getMember(guildId, user.userId)
+                if (member == null) return@Hook;
+                
+                if (settings.getBool("MoreTags_Colorize", true)) {
+                    val foreground = contrastColor(member.color)
+                    tag.apply { 
+                        background.setTint(member.color)
+                        setTextColor(foreground)
+                        getCompoundDrawables()[0]?.setTint(foreground)
+                    }
+                }
+
+                val tagStr = getTag(guildId, member)
+                tag.apply {
+                    text =  if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                    else if (user.isBot() == true) "BOT • ${tagStr}"
+                    else tagStr ?: ""
+                    visibility = if (text == "") View.GONE else View.VISIBLE
+                }
+                
+            } catch (ignored: Throwable) {
+                Patcher.logger.error(ignored)
+            }})
+        }
+
+        with(UserProfileHeaderView::class.java) { 
+            patcher.patch(getDeclaredMethod("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java), Hook { callFrame -> try {
+                val layout = (ReflectUtils.getField(callFrame.thisObject, "binding") as UserProfileHeaderViewBinding).a
+                val state = callFrame.args[0] as UserProfileHeaderViewModel.ViewState.Loaded
+                val member = state.guildMember
+                val user = state.user
+                val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
+
+                if (member == null) return@Hook;
+
+                if (settings.getBool("MoreTags_Colorize", true)) {
+                    val foreground = contrastColor(member.color)
+                    tag.apply { 
+                        background.setTint(member.color)
+                        setTextColor(foreground)
+                        getCompoundDrawables()[0]?.setTint(foreground)
+                    }
+                }
+
+                val tagStr = getTag(member.guildId, member)
+                tag.apply {
+                    text =  if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                    else if (user.isBot() == true) "BOT • ${tagStr}"
+                    else tagStr ?: ""
+                    visibility = if (text == "") View.GONE else View.VISIBLE
+                }
+                
+            } catch (ignored: Throwable) {
+                Patcher.logger.error(ignored)
+            }})
+        }
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()
 
     private fun contrastColor(color: Int): Int {
         val c = Color.valueOf(color)
-        if ((c.red()*76.2 + c.green()*149.69 + c.blue()*29.07) > 186) return Color.BLACK.toInt()
+        if ((c.red()*54.213 + c.green()*182.376 + c.blue()*18.411) >= 140) return Color.BLACK.toInt()
         else return Color.WHITE.toInt()
     }
 
     private fun getTag(guildId: Long, member: GuildMember): String? {
+        val checkOwner = settings.getBool("MoreTags_Owner", true)
         val checkAdmin = settings.getBool("MoreTags_Admin", true)
         val checkStaff = settings.getBool("MoreTags_Staff", true)
         val checkMod = settings.getBool("MoreTags_Mod", true)
-        if (!(checkAdmin || checkStaff || checkMod)) return null
+        if (!(checkOwner || checkAdmin || checkStaff || checkMod)) return null
 
         val guild = StoreStream.getGuilds().getGuild(guildId)
         if (guild == null) return null
 
-        if (guild.isOwner(member.userId)) return "OWNER"
+        if (checkOwner && guild.isOwner(member.userId)) return "OWNER"
         val roleList = StoreStream.getGuilds().roles.get(guildId)
         if (roleList == null) return null;
 
