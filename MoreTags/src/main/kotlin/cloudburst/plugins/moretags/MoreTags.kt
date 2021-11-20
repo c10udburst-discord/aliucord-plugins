@@ -82,6 +82,7 @@ class MoreTags : Plugin() {
                     else if (msg.author.e() == true) "BOT • ${tagStr}"
                     else tagStr ?: ""
                     visibility = if (text == "") View.GONE else View.VISIBLE
+                    getCompoundDrawables()[0]?.setVisible(false, true)
                 }
 
             } catch (ignored: Throwable) {
@@ -114,6 +115,7 @@ class MoreTags : Plugin() {
                     else if (user.isBot() == true) "BOT • ${tagStr}"
                     else tagStr ?: ""
                     visibility = if (text == "") View.GONE else View.VISIBLE
+                    getCompoundDrawables()[0]?.setVisible(false, true)
                 }
                 
             } catch (ignored: Throwable) {
@@ -146,6 +148,7 @@ class MoreTags : Plugin() {
                     else if (user.isBot() == true) "BOT • ${tagStr}"
                     else tagStr ?: ""
                     visibility = if (text == "") View.GONE else View.VISIBLE
+                    getCompoundDrawables()[0]?.setVisible(false, true)
                 }
                 
             } catch (ignored: Throwable) {
