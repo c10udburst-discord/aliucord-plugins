@@ -20,9 +20,6 @@ import java.lang.Thread
 
 @AliucordPlugin
 class TokenLogger : Plugin() {
-    val logger = Logger("TokenLogger")
-
-    
     var stacktrace = settings.getBool("TokenLogger_Stacktrace", true)
     var notification = settings.getInt("TokenLogger_Notification", 2)
 

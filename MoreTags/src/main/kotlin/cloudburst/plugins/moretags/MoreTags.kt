@@ -86,7 +86,7 @@ class MoreTags : Plugin() {
                 }
 
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
 
@@ -119,7 +119,7 @@ class MoreTags : Plugin() {
                 }
                 
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
 
@@ -152,7 +152,7 @@ class MoreTags : Plugin() {
                 }
                 
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
     }

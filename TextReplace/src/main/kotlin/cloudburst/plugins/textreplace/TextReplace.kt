@@ -50,7 +50,7 @@ class TextReplace : Plugin() {
                 }
                 callFrame.result = content
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
 
@@ -61,7 +61,7 @@ class TextReplace : Plugin() {
                 if (messageContent == null) return@PreHook
                 var content = textContentField.get(messageContent) as String? ?:""
                 if (content == "") return@PreHook
-                Patcher.logger.info(content)
+                logger.info(content)
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchUnsent) continue
                     if (rule.matches(content)) {
@@ -71,7 +71,7 @@ class TextReplace : Plugin() {
                 textContentField.set(messageContent, content) //textContentField.set(messageContent, content.take(if (isNitro) 4000 else 2000))
                 return@PreHook
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
 
@@ -88,7 +88,7 @@ class TextReplace : Plugin() {
                 }
                 callFrame.result = content
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
 
             patcher.patch(getDeclaredMethod("c"), Hook { callFrame -> try {
@@ -103,7 +103,7 @@ class TextReplace : Plugin() {
                 }
                 callFrame.result = content
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
     }

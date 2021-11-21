@@ -83,7 +83,7 @@ class SendEmbeds : Plugin() {
                         view.addView(btn)
                     }
                 }  catch (ignored: Throwable) {
-                    Patcher.logger.error(ignored)
+                    logger.error(ignored)
                 }
             })
         })
