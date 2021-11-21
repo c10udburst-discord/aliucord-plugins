@@ -11,7 +11,7 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
   Show <kbd>OWNER</kbd>, <kbd>STAFF</kbd>, <kbd>MOD</kbd>, <kbd>WEBHOOK</kbd> and <kbd>SERVER</kbd> tags appropriately.
 
 - [HighlightOwnMessages](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/HighlightOwnMessages.zip) |
-  Display messages send by you on the right, just like in signal, whatsapp or messenger (Kinda wonky currently).
+  Customize how messages from yourself look.
   
 - [TextReplace](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/TextReplace.zip) |
   Customizable text replacer.

@@ -1,2 +1,2 @@
-version = "1.0.3"
-description = "Display messages send by you on the right, just like in signal, whatsapp or messenger."
+version = "1.1.0"
+description = "Customize how messages from yourself look."

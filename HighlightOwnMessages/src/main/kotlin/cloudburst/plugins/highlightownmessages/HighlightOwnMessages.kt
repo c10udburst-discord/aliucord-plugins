@@ -15,9 +15,15 @@ import android.view.View
 import android.view.Gravity
 import android.widget.TextView
 import android.widget.FrameLayout
+import com.lytefast.flexinput.R
+import com.discord.utilities.color.ColorCompat
 
 @AliucordPlugin
 class HighlightOwnMessages : Plugin() {
+    init {
+        settingsTab = SettingsTab(Settings::class.java, SettingsTab.Type.PAGE).withArgs(settings)
+    }
+
     override fun start(context: Context) {
         val userId = StoreStream.getUsers().me.id
 
@@ -29,24 +35,41 @@ class HighlightOwnMessages : Plugin() {
 
                 val view = callFrame.thisObject as WidgetChatListAdapterItemMessage
                 val textView = (view.itemView.findViewById(textViewId) as TextView)
-                
-                if (message.author?.userId == userId) {
-                    view.itemView.layoutDirection = View.LAYOUT_DIRECTION_RTL
-                    if (textView.lineCount > 1) {
-                        textView.setPadding(256, textView.paddingTop, 0, textView.paddingBottom)
-                        textView.gravity = Gravity.START
+
+                val padding = settings.getInt("Padding", 256)
+
+                if (settings.getBool("RightLeft", true)) {
+                    if (message.author?.userId == userId) {
+                        view.itemView.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                        if (textView.lineCount > 1 && settings.getBool("Multiline", false)) {
+                            textView.setPadding(padding, textView.paddingTop, 0, textView.paddingBottom)
+                            textView.gravity = Gravity.START
+                        } else {
+                            textView.setPadding(padding, textView.paddingTop, 0, textView.paddingBottom)
+                            textView.gravity = Gravity.END
+                        }
                     } else {
-                        textView.setPadding(256, textView.paddingTop, 0, textView.paddingBottom)
-                        textView.gravity = Gravity.END
+                        view.itemView.layoutDirection = View.LAYOUT_DIRECTION_LTR
+                        textView.setPadding(0, textView.paddingTop, 0, textView.paddingBottom)
+                        textView.gravity = Gravity.START
                     }
                 } else {
-                    view.itemView.layoutDirection = View.LAYOUT_DIRECTION_LTR
-                    textView.setPadding(0, textView.paddingTop, 0, textView.paddingBottom)
-                    textView.gravity = Gravity.START
+                    if (message.author?.userId == userId) { textView.setPadding(padding, textView.paddingTop, 0, textView.paddingBottom) }
+                    else { textView.setPadding(0, textView.paddingTop, 0, textView.paddingBottom) }
+                }
+
+                val selfFg = settings.getInt("SelfFg", 0)
+                if (selfFg != 0) {
+                    textView.setTextColor(if (message.author?.userId == userId) selfFg else ColorCompat.getColor(context, R.c.primary_dark_200))
+                }
+
+                val selfBg = settings.getInt("SelfBg", 0)
+                if (selfBg != 0) {
+                    textView.setBackgroundColor(if (message.author?.userId == userId) selfBg else 0)
                 }
 
             } catch (ignored: Throwable) {
-                Patcher.logger.error(ignored)
+                logger.error(ignored)
             }})
         }
     }
