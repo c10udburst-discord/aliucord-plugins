@@ -15,10 +15,6 @@ import com.aliucord.utils.DimenUtils
 import com.aliucord.fragments.InputDialog
 import cloudburst.plugins.editwebhooks.ui.WebhookRecyclerAdapter
 import com.discord.api.channel.Channel
-import com.aliucord.utils.ReflectUtils
-import com.discord.stores.StoreStream
-import com.discord.utilities.rest.RestAPI
-import com.discord.utilities.analytics.AnalyticSuperProperties
 import com.aliucord.utils.GsonUtils
 import cloudburst.plugins.editwebhooks.utils.Webhook
 import cloudburst.plugins.editwebhooks.utils.WebhookRequest
@@ -37,12 +33,8 @@ class WebhookList(val channel: Channel) : SettingsPage() {
     public fun fetchList() {
         val context = requireContext()
         Utils.threadPool.execute {
-            val list = Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channel.h()), "GET")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+            val list = Http.Request.newDiscordRequest("/channels/%d/webhooks".format(channel.h()))
                 .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channel.f(), channel.h()))
-                .setHeader("Accept", "*/*")
                 .execute()
                 .json(Array<Webhook>::class.java)
 
@@ -95,12 +87,8 @@ class WebhookList(val channel: Channel) : SettingsPage() {
     }
 
     private fun createWebhook(name: String) {
-        Http.Request("https://discord.com/api/v9/channels/%s/webhooks".format(channel.h()), "POST")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .executeWithJson(WebhookRequest(name, null))
+        Http.Request.newDiscordRequest("/channels/%s/webhooks".format(channel.h()), "POST")
+            .executeWithJson(WebhookRequest(name, null))
         Utils.showToast("Webhook created")
         fetchList()
     }

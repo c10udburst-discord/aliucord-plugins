@@ -33,7 +33,6 @@ import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
 import com.discord.stores.StorePermissions
 import com.discord.utilities.rest.RestAPI
-import com.discord.utilities.analytics.AnalyticSuperProperties
 
 import com.discord.models.domain.NonceGenerator
 import com.discord.utilities.time.ClockFactory
@@ -225,11 +224,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
 
     private fun getWebhooks(): Array<Webhook> {
         try {
-            return Http.Request("https://discord.com/api/v9/channels/%d/webhooks".format(channelId), "GET")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
+            return Http.Request.newDiscordRequest("/channels/%d/webhooks".format(channelId))
                 .execute()
                 .json(Array<Webhook>::class.java)
         } catch (e: Throwable) {

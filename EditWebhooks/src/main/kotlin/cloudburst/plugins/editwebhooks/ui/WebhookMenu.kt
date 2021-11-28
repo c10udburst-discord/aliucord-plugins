@@ -22,11 +22,8 @@ import java.util.Base64
 
 import com.aliucord.Http
 import com.google.gson.JsonObject
-import com.discord.utilities.rest.RestAPI
-import com.discord.utilities.analytics.AnalyticSuperProperties
 import com.aliucord.utils.ReflectUtils
 import com.aliucord.PluginManager
-import com.discord.stores.StoreStream
 import androidx.fragment.app.FragmentManager
 
 import com.discord.api.message.attachment.MessageAttachment
@@ -99,7 +96,7 @@ class WebhookMenu(
                 if (sendEmbeds != null) {
                     dismiss()
                     val makeModal = ReflectUtils.getField(sendEmbeds, "makeModal") as ((Long, String?) -> AppBottomSheet)
-                    makeModal.invoke(0L, "webhooks/%s/%s".format(webhook?.id, webhook?.token))
+                    makeModal.invoke(0L, "webhooks/%s/%s".format(webhook.id, webhook.token))
                         .show(parentFragmentManager, "SendEmbeds")
                 }  
             }
@@ -172,12 +169,8 @@ class WebhookMenu(
     }
 
     private fun deleteWebhook() {
-        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "DELETE")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .execute()
+        Http.Request.newDiscordRequest("/webhooks/%s".format(webhook.id), "DELETE")
+            .execute()
         Utils.showToast("Webhook deleted")
         parent.fetchList()
         dismiss()
@@ -204,12 +197,8 @@ class WebhookMenu(
     }
 
     private fun rename(newName: String) {
-        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "PATCH")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .executeWithJson(WebhookRequest(newName, null))
+        Http.Request.newDiscordRequest("/webhooks/%s".format(webhook.id), "PATCH")
+            .executeWithJson(WebhookRequest(newName, null))
         Utils.showToast("Webhook renamed")
         parent.fetchList()
         dismiss()
@@ -228,12 +217,8 @@ class WebhookMenu(
         var dataType = type.lowercase()
         if (dataType == "jpg") dataType = "jpeg"
         val datauri = "data:image/%s;base64,%s".format(dataType, Base64.getEncoder().encodeToString(bytes))
-        Http.Request("https://discord.com/api/v9/webhooks/%s".format(webhook.id), "PATCH")
-                .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-                .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-                .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
-                .setHeader("Accept", "*/*")
-                .executeWithJson(WebhookRequest(null, datauri))
+        Http.Request.newDiscordRequest("/webhooks/%s".format(webhook.id), "PATCH")
+            .executeWithJson(WebhookRequest(null, datauri))
         Utils.showToast("Avatar changed")
         parent.fetchList()
         dismiss()

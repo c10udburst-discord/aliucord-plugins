@@ -19,14 +19,10 @@ import com.discord.utilities.color.ColorCompat
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
 import java.lang.reflect.InvocationTargetException
-import com.aliucord.utils.ReflectUtils
-import com.discord.stores.StoreStream
 import com.aliucord.Utils
 import com.aliucord.utils.GsonUtils
 import com.aliucord.Http
 import com.google.gson.JsonObject
-import com.discord.utilities.rest.RestAPI
-import com.discord.utilities.analytics.AnalyticSuperProperties
 
 @AliucordPlugin
 class DeleteEmbeds : Plugin() {
@@ -93,12 +89,8 @@ class DeleteEmbeds : Plugin() {
     override fun stop(context: Context) = patcher.unpatchAll()
 
     fun deleteEmbed(channelId: Long, msgId: Long) {
-        Http.Request("https://discord.com/api/v9/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
-            .setHeader("Authorization", ReflectUtils.getField(StoreStream.getAuthentication(), "authToken") as String?)
-            .setHeader("User-Agent", RestAPI.AppHeadersProvider.INSTANCE.userAgent)
-            .setHeader("X-Super-Properties", AnalyticSuperProperties.INSTANCE.superPropertiesStringBase64)
+        Http.Request.newDiscordRequest("/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
             .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channelId, msgId))
-            .setHeader("Accept", "*/*")
             .executeWithJson(GsonUtils.fromJson("{\"flags\":4}", JsonObject::class.java))
     }
 }
