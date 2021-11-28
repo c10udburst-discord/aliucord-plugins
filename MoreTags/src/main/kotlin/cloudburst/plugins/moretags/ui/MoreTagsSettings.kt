@@ -8,6 +8,7 @@ import com.aliucord.Utils
 import com.discord.views.CheckedSetting
 import com.aliucord.widgets.LinearLayout
 import com.aliucord.api.SettingsAPI
+import com.aliucord.utils.MDUtils
 import android.widget.TextView
 import com.lytefast.flexinput.R
 
@@ -25,6 +26,13 @@ class MoreTagsSettings(private val settings: SettingsAPI) : SettingsPage() {
         })
         addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "Webhook", "Rename \"BOT\" to \"WEBHOOK\" or \"SERVER\" when appropriate.").apply {
             val key = "MoreTags_Webhook"
+            isChecked = settings.getBool(key, true)
+            setOnCheckedListener {
+                settings.setBool(key, it)
+            }
+        })
+        addView(Utils.createCheckedSetting(view.context, CheckedSetting.ViewType.SWITCH, "System", "Rename \"BOT\" to \"SYSTEM\" system messages (eg. Clyde) .").apply {
+            val key = "MoreTags_System"
             isChecked = settings.getBool(key, true)
             setOnCheckedListener {
                 settings.setBool(key, it)
@@ -66,21 +74,29 @@ class MoreTagsSettings(private val settings: SettingsAPI) : SettingsPage() {
             }
         })
         addView(TextView(view.context, null, 0, R.i.UiKit_TextView).apply { 
-            text = """
-            Owner: Owner of the server (duh)
+            text = MDUtils.render("""
+            ***OWNER***: Owner of the server (duh)
 
-            Admin: Has the administrator permission
+            ***ADMIN***: Has the administrator permission
 
-            Staff: Has one of the following permissions:
+            ***STAFF***: Has one of the following permissions:
             - Manage Server
             - Manage Channels
             - Manage Roles
 
-            Mod: Has one of the following permissions
+            ***MOD***: Has one of the following permissions
             - Kick Members
             - Ban Members
             - Manage Messages
-            """.trimIndent()
+
+            ***SERVER***: Message that was crossposted from another server using
+
+            ***WEBHOOK***: Message that was sent by a webhook
+
+            ***SYSTEM***: Sender is a system user (eg. Clyde)
+            """.trimIndent())
+            
+            
         })
     }
 }

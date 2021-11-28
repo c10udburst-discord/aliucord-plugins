@@ -43,6 +43,7 @@ class MoreTags : Plugin() {
     override fun start(context: Context) {
         with(WidgetChatListAdapterItemMessage::class.java) { // in chat
             patcher.patch(getDeclaredMethod("configureItemTag", Message::class.java), Hook { callFrame -> try {
+                
                 val tag = getDeclaredField("itemTag").let {
                     it.isAccessible = true
                     it.get(callFrame.thisObject) as TextView?
@@ -51,39 +52,33 @@ class MoreTags : Plugin() {
 
                 val msg = callFrame.args[0] as Message
 
-                if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null && msg.author.f() == "0000") {
-                    val bgColor = ColorCompat.getColor(context, R.c.brand_new_500)
-                    tag.apply {
-                        text = if (msg.isCrosspost()) "SERVER" else "WEBHOOK"
-                        visibility = View.VISIBLE
-                        background.setTint(bgColor)
-                        setTextColor(contrastColor(bgColor))
-                    }
+                if (msg.author.f() == "0000") {
+                    setTag(context, tag, 
+                        if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null)
+                            (if (msg.isCrosspost()) "SERVER" else "WEBHOOK")
+                        else if (settings.getBool("MoreTags_System", true) && msg.author.i() == -1L)
+                            "SYSTEM"
+                        else "BOT"
+                    , null)
                     return@Hook
                 }
 
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
-                if (!channel.isGuild()) return@Hook
-            
-                val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
-                if (member == null) return@Hook;
-                if (settings.getBool("MoreTags_Colorize", true)) {
-                    val foreground = contrastColor(member.color)
-                    tag.apply { 
-                        background.setTint(member.color)
-                        setTextColor(foreground)
-                        getCompoundDrawables()[0]?.setTint(foreground)
-                    }
-                }
+                if (channel.guildId == null) {
+                    setTag(context, tag, if (msg.author.e() == true) "BOT" else "", null)
+                } else {
+                    val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
+                    if (member == null) return@Hook;
 
-                val tagStr = getTag(channel.guildId, member)
-                tag.apply {
-                    text =  if (msg.author.e() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                    else if (msg.author.e() == true) "BOT • ${tagStr}"
-                    else tagStr ?: ""
-                    visibility = if (text == "") View.GONE else View.VISIBLE
-                    getCompoundDrawables()[0]?.setVisible(false, true)
+                    val tagStr = getTag(channel.guildId, member)
+                    setTag(context, tag, 
+                        if (msg.author.e() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                        else if (msg.author.e() == true) "BOT • ${tagStr}"
+                        else tagStr ?: "",
+                    member.color)
                 }
+            
+                
 
             } catch (ignored: Throwable) {
                 logger.error(ignored)
@@ -97,25 +92,18 @@ class MoreTags : Plugin() {
                 val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
 
                 val guildId = user.guildId
-                val member = StoreStream.getGuilds().getMember(guildId, user.userId)
-                if (member == null) return@Hook;
-                
-                if (settings.getBool("MoreTags_Colorize", true)) {
-                    val foreground = contrastColor(member.color)
-                    tag.apply { 
-                        background.setTint(member.color)
-                        setTextColor(foreground)
-                        getCompoundDrawables()[0]?.setTint(foreground)
-                    }
-                }
+                if (guildId == null) {
+                    setTag(context, tag, if (user.isBot() == true) "BOT" else "", null)
+                } else {
+                    val member = StoreStream.getGuilds().getMember(guildId, user.userId)
+                    if (member == null) return@Hook;
 
-                val tagStr = getTag(guildId, member)
-                tag.apply {
-                    text =  if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                    else if (user.isBot() == true) "BOT • ${tagStr}"
-                    else tagStr ?: ""
-                    visibility = if (text == "") View.GONE else View.VISIBLE
-                    getCompoundDrawables()[0]?.setVisible(false, true)
+                    val tagStr = getTag(guildId, member)
+                    setTag(context, tag, 
+                        if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                        else if (user.isBot() == true) "BOT • ${tagStr}"
+                        else tagStr ?: "",
+                    member.color)
                 }
                 
             } catch (ignored: Throwable) {
@@ -133,23 +121,12 @@ class MoreTags : Plugin() {
 
                 if (member == null) return@Hook;
 
-                if (settings.getBool("MoreTags_Colorize", true)) {
-                    val foreground = contrastColor(member.color)
-                    tag.apply { 
-                        background.setTint(member.color)
-                        setTextColor(foreground)
-                        getCompoundDrawables()[0]?.setTint(foreground)
-                    }
-                }
-
                 val tagStr = getTag(member.guildId, member)
-                tag.apply {
-                    text =  if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                setTag(context, tag, 
+                    if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
                     else if (user.isBot() == true) "BOT • ${tagStr}"
-                    else tagStr ?: ""
-                    visibility = if (text == "") View.GONE else View.VISIBLE
-                    getCompoundDrawables()[0]?.setVisible(false, true)
-                }
+                    else tagStr ?: "",
+                member.color)
                 
             } catch (ignored: Throwable) {
                 logger.error(ignored)
@@ -158,6 +135,25 @@ class MoreTags : Plugin() {
     }
 
     override fun stop(context: Context) = patcher.unpatchAll()
+
+    private fun setTag(context: Context, tag: TextView, newText: String, color: Int?) {
+        val bgColor = if (settings.getBool("MoreTags_Colorize", true) && color != null)
+            color
+        else
+            ColorCompat.getColor(context, R.c.brand_new_500)
+        val fgColor = contrastColor(bgColor)
+        tag.apply { 
+            text = newText
+            visibility = if (newText == "") View.GONE else View.VISIBLE
+            background.setTint(bgColor)
+            setTextColor(fgColor)
+            getCompoundDrawables().let {
+                it.set(0, it[0]?.mutate())
+                it[0]?.setVisible(false, true)
+                it[0]?.setTint(fgColor)
+            }
+        }
+    }
 
     private fun contrastColor(color: Int): Int {
         val c = Color.valueOf(color)

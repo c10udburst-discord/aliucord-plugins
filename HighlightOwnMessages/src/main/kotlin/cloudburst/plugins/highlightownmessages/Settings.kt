@@ -54,7 +54,7 @@ class Settings(private val settings: SettingsAPI) : SettingsPage() {
         })
 
         var selfFg: View? = null
-        selfFg = TextInput(view.context, "Self Foreground Color", settings.getInt("SelfFg", 0).toString(), View.OnClickListener { it ->
+        selfFg = TextInput(view.context, "Self Foreground Color", settings.getInt("SelfFg", 0).toString(), View.OnClickListener {
             if (selfFg != null) colorPicker(selfFg as TextInput)
         }).apply {
             editText.inputType = InputType.TYPE_CLASS_NUMBER
@@ -65,7 +65,7 @@ class Settings(private val settings: SettingsAPI) : SettingsPage() {
         addView(selfFg)
 
         var selfBg: View? = null
-        selfBg = TextInput(view.context, "Self Background Color", settings.getInt("SelfBg", 0).toString(), View.OnClickListener { it ->
+        selfBg = TextInput(view.context, "Self Background Color", settings.getInt("SelfBg", 0).toString(), View.OnClickListener {
             if (selfBg != null) colorPicker(selfBg as TextInput)
         }).apply {
             editText.inputType = InputType.TYPE_CLASS_NUMBER
