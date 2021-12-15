@@ -19,7 +19,6 @@ import com.aliucord.views.Button
 import com.aliucord.views.ToolbarButton
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import com.lytefast.flexinput.R
 import com.aliucord.fragments.InputDialog
 
 class ReplacerSettings : SettingsPage() {
@@ -119,8 +118,8 @@ class ReplacerSettings : SettingsPage() {
             exportBtn.setPadding(p, p, p, p)
             importBtn.setPadding(p, p, p, p)
 
-            exportBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_file_download_white_24dp))
-            importBtn.setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_file_upload_24dp))
+            exportBtn.setImageDrawable(ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_download_white_24dp", "drawable")))
+            importBtn.setImageDrawable(ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_upload_24dp", "drawable")))
 
             addHeaderButton(exportBtn)
             addHeaderButton(importBtn)

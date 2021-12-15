@@ -1,5 +1,7 @@
 package cloudburst.plugins.textreplace
 
+import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import com.aliucord.annotations.AliucordPlugin
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.Hook
@@ -20,6 +22,7 @@ import cloudburst.plugins.textreplace.ui.ReplacerSettings
 
 @AliucordPlugin
 class TextReplace : Plugin() {
+    lateinit var pluginIcon: Drawable
     private val textContentField =
     MessageContent::class.java.getDeclaredField("textContent").apply {
         isAccessible = true
@@ -27,6 +30,10 @@ class TextReplace : Plugin() {
 
     init {
         settingsTab = SettingsTab(ReplacerSettings::class.java)
+    }
+
+    override fun load(context: Context) {
+        pluginIcon = ContextCompat.getDrawable(context, Utils.getResId("drawable_icon_sync_integration", "drawable"))
     }
 
     override fun start(context: Context) {
