@@ -33,7 +33,7 @@ class TextReplace : Plugin() {
     }
 
     override fun load(context: Context) {
-        pluginIcon = ContextCompat.getDrawable(context, Utils.getResId("drawable_icon_sync_integration", "drawable"))
+        pluginIcon = ContextCompat.getDrawable(context, Utils.getResId("drawable_icon_sync_integration", "drawable"))!!
     }
 
     override fun start(context: Context) {
