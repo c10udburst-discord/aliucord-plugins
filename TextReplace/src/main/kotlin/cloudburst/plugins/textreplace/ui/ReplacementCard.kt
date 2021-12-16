@@ -1,9 +1,13 @@
 package cloudburst.plugins.textreplace.ui
 
 import android.content.Context
+import android.view.View
+import androidx.cardview.widget.CardView
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.textfield.TextInputLayout
 import com.aliucord.views.TextInput
 import com.aliucord.utils.DimenUtils
+import com.aliucord.utils.ReflectUtils
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
 import cloudburst.plugins.textreplace.utils.TextReplacement
@@ -28,10 +32,12 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
             setPadding(p, p, p, p)
         }
 
-        fromInput = TextInput(ctx, "From")
+        fromInput = TextInput(ctx)
+        fromInput.setInputHint("From")
         linearLayout.addView(fromInput)
 
-        replacementInput = TextInput(ctx, "To")
+        replacementInput = TextInput(ctx)
+        replacementInput.setInputHint("To")
         linearLayout.addView(replacementInput)
 
         isRegex = Utils.createCheckedSetting(
@@ -75,6 +81,16 @@ class ReplacerCard(ctx: Context) : MaterialCardView(ctx) {
         linearLayout.addView(matchEmbeds)
 
         addView(linearLayout)
+    }
+
+
+    fun TextInput.setInputHint(hint: CharSequence) {
+        if (this is CardView) {
+            val root = ReflectUtils.invokeMethod(this, "getRoot") as TextInputLayout
+            root.hint = hint
+        } else {
+            (this as TextInputLayout).hint = hint
+        }
     }
 
     public fun apply(replacement: TextReplacement) {
