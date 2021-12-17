@@ -68,7 +68,6 @@ class TextReplace : Plugin() {
                 if (messageContent == null) return@PreHook
                 var content = textContentField.get(messageContent) as String? ?:""
                 if (content == "") return@PreHook
-                logger.info(content)
                 for (rule in TextReplace.replacementRules) {
                     if (!rule.matchUnsent) continue
                     if (rule.matches(content)) {
