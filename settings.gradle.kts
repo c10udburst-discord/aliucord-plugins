@@ -16,7 +16,4 @@ project(":SendEmbeds").projectDir = File("./SendEmbeds")
 include(":TextReplace")
 project(":TextReplace").projectDir = File("./TextReplace")
 
-include(":TokenLogger")
-project(":TokenLogger").projectDir = File("./TokenLogger")
-
 rootProject.name = "AliucordPlugins"
