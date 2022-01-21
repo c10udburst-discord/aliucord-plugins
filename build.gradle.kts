@@ -10,8 +10,8 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.2")
-        classpath("com.github.Aliucord:gradle:main-SNAPSHOT")
+        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.aliucord:gradle:main-SNAPSHOT")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30")
     }
 }
@@ -44,7 +44,7 @@ subprojects {
 
         defaultConfig {
             minSdk = 24
-            targetSdk= 30
+            targetSdk= 31
             versionCode = 1
             versionName = "1.0"
         }
@@ -56,20 +56,26 @@ subprojects {
 
         tasks.withType<KotlinCompile> {
             kotlinOptions {
-                jvmTarget = "11"
+                jvmTarget = "11" // Required
+                // Disables some unnecessary features
+                freeCompilerArgs = freeCompilerArgs +
+                        "-Xno-call-assertions" +
+                        "-Xno-param-assertions" +
+                        "-Xno-receiver-assertions"
             }
         }
     }
 
     dependencies {
-        val api by configurations
+        val implementation by configurations
         val discord by configurations
 
         discord("com.discord:discord:aliucord-SNAPSHOT")
-        api("com.github.Aliucord:Aliucord:main-SNAPSHOT")
+        implementation ("com.aliucord:Aliucord:main-SNAPSHOT")
 
-        "implementation"("androidx.appcompat:appcompat:1.3.1")
-        "implementation"("com.google.android.material:material:1.4.0")
+        implementation("androidx.appcompat:appcompat:1.3.1")
+        implementation("com.google.android.material:material:1.4.0")
+        implementation("androidx.constraintlayout:constraintlayout:2.1.2")
     }
 }
 
