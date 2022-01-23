@@ -18,6 +18,3 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
   
 - [SendEmbeds](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/SendEmbeds.zip) |
   Adds a `/embed` command and a button  which opens an ui which can be used to send embeds (using links and webhooks).
-
-- [TokenLogger](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/TokenLogger.zip) |
-  Notify when something accesses your authentication token
