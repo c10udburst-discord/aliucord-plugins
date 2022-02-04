@@ -119,7 +119,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
                         Utils.getResId("color_picker_title", "string"), 
                         ColorCompat.getThemedColor(context, R.b.colorAccent)
                     )
-                    builder.k = object: c.k.a.a.f { // color picker listener i guess
+                    builder.k = object: b.k.a.a.f { // color picker listener i guess
                         override fun onColorReset(i: Int) { }
 
                         override fun onColorSelected(i: Int, i2: Int) {

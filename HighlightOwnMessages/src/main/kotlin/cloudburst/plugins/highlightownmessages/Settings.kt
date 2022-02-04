@@ -95,7 +95,7 @@ class Settings(private val settings: SettingsAPI) : SettingsPage() {
             Color.BLACK
         )
         builder.arguments?.putBoolean("alpha", true)
-        builder.k = object: c.k.a.a.f { // color picker listener i guess
+        builder.k = object: b.k.a.a.f { // color picker listener i guess
             override fun onColorReset(i: Int) { }
 
             override fun onColorSelected(i: Int, i2: Int) {
