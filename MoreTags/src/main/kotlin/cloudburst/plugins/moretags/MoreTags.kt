@@ -29,6 +29,7 @@ import com.discord.databinding.WidgetChannelMembersListItemUserBinding
 import com.discord.widgets.user.profile.UserProfileHeaderView
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel
 import com.discord.databinding.UserProfileHeaderViewBinding
+import com.discord.models.user.CoreUser
 
 import cloudburst.plugins.moretags.ui.MoreTagsSettings
 
@@ -51,12 +52,13 @@ class MoreTags : Plugin() {
                 if (tag == null) return@Hook
 
                 val msg = callFrame.args[0] as Message
+                val user = CoreUser(msg.author)
 
-                if (msg.author.f() == "0000") {
+                if (user.discriminator == "0000") {
                     setTag(context, tag, 
                         if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null)
                             (if (msg.isCrosspost()) "SERVER" else "WEBHOOK")
-                        else if (settings.getBool("MoreTags_System", true) && msg.author.i() == -1L)
+                        else if (settings.getBool("MoreTags_System", true) && user.id == -1L)
                             "SYSTEM"
                         else "BOT"
                     , null)
@@ -65,15 +67,15 @@ class MoreTags : Plugin() {
 
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
                 if (channel.guildId == null) {
-                    setTag(context, tag, if (msg.author.e() == true) "BOT" else "", null)
+                    setTag(context, tag, if user.isBot() "BOT" else "", null)
                 } else {
-                    val member = StoreStream.getGuilds().getMember(channel.guildId, msg.author.i())
+                    val member = StoreStream.getGuilds().getMember(channel.guildId, user.id)
                     if (member == null) return@Hook;
 
                     val tagStr = getTag(channel.guildId, member)
                     setTag(context, tag, 
-                        if (msg.author.e() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                        else if (msg.author.e() == true) "BOT • ${tagStr}"
+                        if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                        else if user.isBot() "BOT • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
                 }
