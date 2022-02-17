@@ -67,7 +67,7 @@ class MoreTags : Plugin() {
 
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
                 if (channel.guildId == null) {
-                    setTag(context, tag, if user.isBot() "BOT" else "", null)
+                    setTag(context, tag, if (user.isBot()) "BOT" else "", null)
                 } else {
                     val member = StoreStream.getGuilds().getMember(channel.guildId, user.id)
                     if (member == null) return@Hook;
@@ -75,7 +75,7 @@ class MoreTags : Plugin() {
                     val tagStr = getTag(channel.guildId, member)
                     setTag(context, tag, 
                         if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                        else if user.isBot() "BOT • ${tagStr}"
+                        else if (user.isBot()) "BOT • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
                 }
@@ -95,15 +95,15 @@ class MoreTags : Plugin() {
 
                 val guildId = user.guildId
                 if (guildId == null) {
-                    setTag(context, tag, if (user.isBot() == true) "BOT" else "", null)
+                    setTag(context, tag, if (user.isBot()) "BOT" else "", null)
                 } else {
                     val member = StoreStream.getGuilds().getMember(guildId, user.userId)
                     if (member == null) return@Hook;
 
                     val tagStr = getTag(guildId, member)
                     setTag(context, tag, 
-                        if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                        else if (user.isBot() == true) "BOT • ${tagStr}"
+                        if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                        else if (user.isBot()) "BOT • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
                 }
@@ -125,8 +125,8 @@ class MoreTags : Plugin() {
 
                 val tagStr = getTag(member.guildId, member)
                 setTag(context, tag, 
-                    if (user.isBot() == true && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                    else if (user.isBot() == true) "BOT • ${tagStr}"
+                    if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
+                    else if (user.isBot()) "BOT • ${tagStr}"
                     else tagStr ?: "",
                 member.color)
                 
