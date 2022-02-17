@@ -54,7 +54,7 @@ class MoreTags : Plugin() {
                 val msg = callFrame.args[0] as Message
                 val user = CoreUser(msg.author)
 
-                if (user.discriminator == "0000") {
+                if (user.discriminator == 0) {
                     setTag(context, tag, 
                         if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null)
                             (if (msg.isCrosspost()) "SERVER" else "WEBHOOK")
