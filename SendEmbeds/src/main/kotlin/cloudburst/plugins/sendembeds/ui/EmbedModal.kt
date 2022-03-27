@@ -269,6 +269,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
                     emptyList(),
                     false
             ),
+            null,
             null
         )
         RestAPI.api.sendMessage(channelId, message).subscribe(createActionSubscriber({ }))
