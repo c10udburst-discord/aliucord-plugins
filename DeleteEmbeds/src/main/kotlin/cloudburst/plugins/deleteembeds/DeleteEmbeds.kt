@@ -47,6 +47,8 @@ class DeleteEmbeds : Plugin() {
                         } else if (message.hasAttachments() && !message.content.isEmpty()) {
                             visibility = if (message.author.id == StoreStream.getUsers().me.id) 
                                 View.VISIBLE else View.GONE
+                        } else {
+                            visibility = View.GONE
                         }
                     }
 
@@ -55,7 +57,8 @@ class DeleteEmbeds : Plugin() {
                              Utils.threadPool.execute {
                                 if (message.hasEmbeds()) {
                                     deleteEmbed(message.channelId, message.id)
-                                } else if (message.hasAttachments() && message.author.id == StoreStream.getUsers().me.id) {
+                                }
+                                if (message.hasAttachments() && message.author.id == StoreStream.getUsers().me.id) {
                                     deleteAttachements(message.channelId, message.id)
                                 }
                              }
