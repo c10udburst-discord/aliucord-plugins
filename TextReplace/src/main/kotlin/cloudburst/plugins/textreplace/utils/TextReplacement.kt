@@ -8,20 +8,17 @@ data class TextReplacement(
     val matchUnsent: Boolean,
     val matchSent: Boolean,
     val matchEmbeds: Boolean) {
-        @Transient
-        private val fromRegex = if (isRegex) { fromInput.toRegex() } else { null }
-
         public fun matches(message: String): Boolean {
-            if (fromRegex != null) {
-                return fromRegex.containsMatchIn(message)
+            if (isRegex) {
+                return fromInput.toRegex().containsMatchIn(message)
             } else {
                 return message.contains(fromInput)
             }
         }
 
         public fun replace(message: String): String {
-            if (fromRegex != null) {
-                return fromRegex.replace(message, replacement)
+            if (isRegex) {
+                return fromInput.toRegex().replace(message, replacement)
             } else {
                 return message.replace(fromInput, replacement, ignoreCase)
             }
