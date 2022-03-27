@@ -16,6 +16,7 @@ import com.aliucord.fragments.InputDialog
 import com.aliucord.patcher.Hook
 import com.discord.databinding.WidgetChatListActionsBinding
 import com.discord.utilities.color.ColorCompat
+import com.discord.stores.StoreStream
 import com.discord.widgets.chat.list.actions.WidgetChatListActions
 import com.lytefast.flexinput.R
 import java.lang.reflect.InvocationTargetException
@@ -40,19 +41,23 @@ class DeleteEmbeds : Plugin() {
 
                     val binding = getBinding.invoke(callFrame.thisObject) as WidgetChatListActionsBinding
                     val deleteEmbed = binding.a.findViewById<TextView>(deleteEmbedId).apply {
-                        if (!message.hasEmbeds()) {
-                            visibility = View.GONE
-                        } else if (!(callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canDelete) {
-                            visibility = View.GONE
-                        } else {
-                            visibility = View.VISIBLE
+                        if (message.hasEmbeds()) {
+                            visibility = if ((callFrame.args[0] as WidgetChatListActions.Model).manageMessageContext.canDelete) 
+                                View.VISIBLE else View.GONE
+                        } else if (message.hasAttachments() && !message.content.isEmpty()) {
+                            visibility = if (message.author.id == StoreStream.getUsers().me.id) 
+                                View.VISIBLE else View.GONE
                         }
                     }
 
                     if (!deleteEmbed.hasOnClickListeners()) deleteEmbed.setOnClickListener {
                         try {
                              Utils.threadPool.execute {
-                                 deleteEmbed(message.channelId, message.id)
+                                if (message.hasEmbeds()) {
+                                    deleteEmbed(message.channelId, message.id)
+                                } else if (message.hasAttachments() && message.author.id == StoreStream.getUsers().me.id) {
+                                    deleteAttachements(message.channelId, message.id)
+                                }
                              }
                              (callFrame.thisObject as WidgetChatListActions).dismiss()
                         } catch (e: IllegalAccessException) {
@@ -92,5 +97,11 @@ class DeleteEmbeds : Plugin() {
         Http.Request.newDiscordRequest("/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
             .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channelId, msgId))
             .executeWithJson(GsonUtils.fromJson("{\"flags\":4}", JsonObject::class.java))
+    }
+
+    fun deleteAttachements(channelId: Long, msgId: Long) {
+        Http.Request.newDiscordRequest("/channels/%d/messages/%d".format(channelId, msgId), "PATCH")
+            .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channelId, msgId))
+            .executeWithJson(GsonUtils.fromJson("{\"attachments\":[]}", JsonObject::class.java))
     }
 }
