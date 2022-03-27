@@ -13,6 +13,7 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.utils.DimenUtils
 import com.aliucord.fragments.InputDialog
+import com.aliucord.wrappers.ChannelWrapper
 import cloudburst.plugins.editwebhooks.ui.WebhookRecyclerAdapter
 import com.discord.api.channel.Channel
 import com.aliucord.utils.GsonUtils
@@ -21,11 +22,13 @@ import cloudburst.plugins.editwebhooks.utils.WebhookRequest
 import com.aliucord.Http
 import com.aliucord.views.Button
 
-class WebhookList(val channel: Channel) : SettingsPage() {
+class WebhookList(val channelRaw: Channel) : SettingsPage() {
+
+    private val channel = ChannelWrapper(channelRaw)
 
     override fun onViewBound(view: View) {
         super.onViewBound(view)
-        setActionBarTitle(channel.m())
+        setActionBarTitle(channel.name)
         
         fetchList()
     }
@@ -33,8 +36,8 @@ class WebhookList(val channel: Channel) : SettingsPage() {
     public fun fetchList() {
         val context = requireContext()
         Utils.threadPool.execute {
-            val list = Http.Request.newDiscordRequest("/channels/%d/webhooks".format(channel.h()))
-                .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channel.f(), channel.h()))
+            val list = Http.Request.newDiscordRequest("/channels/%d/webhooks".format(channel.id))
+                .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channel.guildId, channel.id))
                 .execute()
                 .json(Array<Webhook>::class.java)
 
@@ -87,7 +90,7 @@ class WebhookList(val channel: Channel) : SettingsPage() {
     }
 
     private fun createWebhook(name: String) {
-        Http.Request.newDiscordRequest("/channels/%s/webhooks".format(channel.h()), "POST")
+        Http.Request.newDiscordRequest("/channels/%s/webhooks".format(channel.id), "POST")
             .executeWithJson(WebhookRequest(name, null))
         Utils.showToast("Webhook created")
         fetchList()
