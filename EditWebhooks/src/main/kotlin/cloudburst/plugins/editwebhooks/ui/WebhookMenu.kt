@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentManager
 import com.discord.api.message.attachment.MessageAttachment
 import com.discord.utilities.SnowflakeUtils
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemAttachment
+import com.discord.widgets.guilds.profile.WidgetGuildProfileSheet
 
 import cloudburst.plugins.editwebhooks.ui.WebhookList
 
@@ -53,6 +54,7 @@ class WebhookMenu(
         val avatarIcon = ContextCompat.getDrawable(context, R.e.ic_profile_24dp)
         val renameIcon = ContextCompat.getDrawable(context, R.e.ic_edit_24dp)
         val changeAvatarIcon = ContextCompat.getDrawable(context, R.e.ic_camera_24dp)
+        val guildIcon = ContextCompat.getDrawable(context, R.e.ic_info_24dp)
 
         val title = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
             text = webhook.name
@@ -154,6 +156,18 @@ class WebhookMenu(
             typeface = font
         }
 
+        val showGuild = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+            text = "Show source guild"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(guildIcon, null, null, null)
+            setOnClickListener {
+                if (webhook.source_guild != null && webhook.source_channel != null) {
+                    WidgetGuildProfileSheet.Companion(null).show(parentFragmentManager, true, webhook.source_guild.id, webhook.source_channel.id, false)
+                }
+            }
+            setClickable(true)
+            typeface = font
+        }
+
         layout.addView(title)
         if (webhook.token != null)
             layout.addView(copyWebhook)
@@ -161,6 +175,8 @@ class WebhookMenu(
             layout.addView(sendEmbed)
         if (webhook.avatar != null)
             layout.addView(viewAvatar)
+        if (webhook.source_guild != null && webhook.source_channel != null)
+            layout.addView(showGuild)
         layout.addView(renameWebhook)
         layout.addView(setAvatar)
         layout.addView(deleteWebhook)

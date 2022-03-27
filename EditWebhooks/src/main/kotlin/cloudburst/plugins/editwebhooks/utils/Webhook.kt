@@ -5,7 +5,9 @@ data class Webhook(
     val avatar: String?,
     val token: String?,
     val name: String?,
-    val id: String?
+    val id: String?,
+    val source_guild: Source?,
+    val source_channel: Source?
 ) {
     val url: String
         get() {
@@ -28,3 +30,8 @@ data class Webhook(
                 return "Unknown"
         }
 }
+
+data class Source(
+    val id: Long,
+    val name: String
+)
