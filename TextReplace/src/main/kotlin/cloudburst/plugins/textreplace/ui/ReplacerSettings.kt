@@ -72,26 +72,8 @@ class ReplacerSettings : SettingsPage() {
         }
 
         if (headerBar.findViewById<View>(headerId) == null) {
-            val p = (DimenUtils.defaultPadding / 2)
 
-            val exportBtn = ToolbarButton(ctx)
-            exportBtn.setId(headerId)
-            val importBtn = ToolbarButton(ctx)
-
-            exportBtn.layoutParams = Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT).apply {
-                gravity = Gravity.END
-            }
-            importBtn.layoutParams = Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT).apply {
-                gravity = Gravity.END
-                setMarginEnd(p)
-            }
-
-            exportBtn.setOnClickListener {
-                updateRules(recycler)
-                Utils.setClipboard("TextReplaceRules", GsonUtils.toJson(replacementRules))
-                Utils.showToast("Rules copied to clipboard")
-            }
-            importBtn.setOnClickListener {
+            addHeaderButton("Import", ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_upload_24dp", "drawable"))) {
                 val inDialog = InputDialog()
                                 .setTitle("Import rules")
                                 .setDescription("Paste previously exported rules here")
@@ -113,16 +95,15 @@ class ReplacerSettings : SettingsPage() {
                                     }
                                 }
                 inDialog.show(parentFragmentManager, "ImportRules")
+                true
+            }
+            addHeaderButton("Export", ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_download_white_24dp", "drawable"))) {
+                updateRules(recycler)
+                Utils.setClipboard("TextReplaceRules", GsonUtils.toJson(replacementRules))
+                Utils.showToast("Rules copied to clipboard")
+                true
             }
 
-            exportBtn.setPadding(p, p, p, p)
-            importBtn.setPadding(p, p, p, p)
-
-            exportBtn.setImageDrawable(ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_download_white_24dp", "drawable")))
-            importBtn.setImageDrawable(ContextCompat.getDrawable(ctx, Utils.getResId("ic_file_upload_24dp", "drawable")))
-
-            addHeaderButton(exportBtn)
-            addHeaderButton(importBtn)
         }
     }
 
