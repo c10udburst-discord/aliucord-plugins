@@ -162,7 +162,7 @@ class MoreTags : Plugin() {
 
                 val tagStr = getTag(member.guildId, member)
                 setTag(context, tag, 
-                    if (((settings.getBool("MoreTags_BotOnly", false) && tagStr != "") || tagStr == null) botText
+                    if ((settings.getBool("MoreTags_BotOnly", false) && tagStr != "") || tagStr == null) botText
                     else if (botText != "") "${botText} • ${tagStr}"
                     else tagStr ?: "",
                 member.color)
