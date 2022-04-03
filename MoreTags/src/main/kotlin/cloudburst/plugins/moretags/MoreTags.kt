@@ -51,6 +51,8 @@ class MoreTags : Plugin() {
                 }
                 if (tag == null) return@Hook
 
+                tag.visibility = View.GONE
+
                 val msg = callFrame.args[0] as Message
                 val user = CoreUser(msg.author)
 
@@ -58,24 +60,34 @@ class MoreTags : Plugin() {
                     setTag(context, tag, 
                         if (settings.getBool("MoreTags_Webhook", true) && msg.webhookId != null)
                             (if (msg.isCrosspost()) "SERVER" else "WEBHOOK")
-                        else if (settings.getBool("MoreTags_System", true) && user.id == -1L)
+                        else if (settings.getBool("MoreTags_System", true) && (user.isSystemUser() || user.id == -1L))
                             "SYSTEM"
-                        else "BOT"
+                        else if (user.isBot())
+                            "BOT"
+                        else
+                            ""
                     , null)
                     return@Hook
                 }
 
+                val botText = if (settings.getBool("MoreTags_System", true) && user.isSystemUser())
+                    "SYSTEM"
+                else if (user.isBot())
+                    "BOT"
+                else
+                    ""
+
                 val channel = ChannelWrapper(StoreStream.getChannels().getChannel(msg.channelId))
-                if (channel.guildId == null) {
-                    setTag(context, tag, if (user.isBot()) "BOT" else "", null)
+                if (!channel.isGuild() || channel.guildId == null) {
+                    setTag(context, tag, botText, null)
                 } else {
                     val member = StoreStream.getGuilds().getMember(channel.guildId, user.id)
                     if (member == null) return@Hook;
 
                     val tagStr = getTag(channel.guildId, member)
                     setTag(context, tag, 
-                        if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                        else if (user.isBot()) "BOT • ${tagStr}"
+                        if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                        else if (botText != "") "${botText} • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
                 }
@@ -93,17 +105,24 @@ class MoreTags : Plugin() {
                 val user = callFrame.args[0] as ChannelMembersListAdapter.Item.Member
                 val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
 
+                tag.visibility = View.GONE
+
+                val botText = if (user.isBot())
+                    "BOT"
+                else
+                    ""
+
                 val guildId = user.guildId
                 if (guildId == null) {
-                    setTag(context, tag, if (user.isBot()) "BOT" else "", null)
+                    setTag(context, tag, botText, null)
                 } else {
                     val member = StoreStream.getGuilds().getMember(guildId, user.userId)
                     if (member == null) return@Hook;
 
                     val tagStr = getTag(guildId, member)
                     setTag(context, tag, 
-                        if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                        else if (user.isBot()) "BOT • ${tagStr}"
+                        if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                        else if (botText != "") "${botText} • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
                 }
@@ -121,12 +140,30 @@ class MoreTags : Plugin() {
                 val user = state.user
                 val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
 
-                if (member == null) return@Hook;
+                tag.visibility = View.GONE
+                if (member == null) {
+                    setTag(context, tag, 
+                        if (user.discriminator == 0 && settings.getBool("MoreTags_System", true) && (user.isSystemUser() || user.id == -1L))
+                            "SYSTEM"
+                        else if (user.isBot())
+                            "BOT"
+                        else
+                            ""
+                    , null)
+                    return@Hook
+                }
+
+                val botText = if (settings.getBool("MoreTags_System", true) && user.isSystemUser())
+                    "SYSTEM"
+                else if (user.isBot())
+                    "BOT"
+                else
+                    ""
 
                 val tagStr = getTag(member.guildId, member)
                 setTag(context, tag, 
-                    if (user.isBot() && (settings.getBool("MoreTags_BotOnly", false) || tagStr == null)) "BOT"
-                    else if (user.isBot()) "BOT • ${tagStr}"
+                    if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                    else if (botText != "") "${botText} • ${tagStr}"
                     else tagStr ?: "",
                 member.color)
                 
@@ -150,8 +187,7 @@ class MoreTags : Plugin() {
             background.setTint(bgColor)
             setTextColor(fgColor)
             getCompoundDrawables().let {
-                it.set(0, it[0]?.mutate())
-                it[0]?.setVisible(false, true)
+                it[0]?.setVisible(false, false)
                 it[0]?.setTint(fgColor)
             }
         }
@@ -180,6 +216,7 @@ class MoreTags : Plugin() {
         var isAdmin = false
         var isMod = false
         var isStaff = false
+        
         for (roleId in member.roles) {
             val role = roleList.get(roleId)
             if (role == null) continue
@@ -195,7 +232,8 @@ class MoreTags : Plugin() {
             }
             if (PermissionUtils.can(Permission.KICK_MEMBERS, perms) 
                 || PermissionUtils.can(Permission.BAN_MEMBERS, perms) 
-                || PermissionUtils.can(Permission.MANAGE_MESSAGES, perms)) {
+                || PermissionUtils.can(Permission.MANAGE_MESSAGES, perms)
+                || PermissionUtils.can(Permission.MOVE_MEMBERS, perms)) {
                 isMod = true
             }
             
