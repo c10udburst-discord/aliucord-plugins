@@ -12,7 +12,7 @@ import com.discord.widgets.chat.managereactions.ManageReactionsEmojisAdapter
 import com.discord.databinding.WidgetManageReactionsEmojiBinding
 
 @AliucordPlugin
-class MoreTags : Plugin() {
+class ReactionEmojiName : Plugin() {
 
     override fun start(context: Context) {
         with(ManageReactionsEmojisAdapter.ReactionEmojiViewHolder::class.java) {

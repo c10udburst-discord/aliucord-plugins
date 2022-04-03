@@ -10,6 +10,9 @@ project(":HighlightOwnMessages").projectDir = File("./HighlightOwnMessages")
 include(":MoreTags")
 project(":MoreTags").projectDir = File("./MoreTags")
 
+include(":Notifier")
+project(":Notifier").projectDir = File("./Notifier")
+
 include(":ReactionEmojiName")
 project(":ReactionEmojiName").projectDir = File("./ReactionEmojiName")
 

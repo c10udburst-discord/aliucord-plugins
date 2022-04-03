@@ -12,6 +12,8 @@ Click on a plugin name to download, and then move the downloaded file to the `Al
 
 - [ReactionEmojiName](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/ReactionEmojiName.zip) | Long press to see the reaction name (Updated version of [this](https://github.com/terabyte25/plugins))
 
+- [Notifier](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/Notifier.zip) | Log guild leaves and unfriends
+
 - [HighlightOwnMessages](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/HighlightOwnMessages.zip) |
   Customize how messages from yourself look.
   
