@@ -86,7 +86,7 @@ class MoreTags : Plugin() {
 
                     val tagStr = getTag(channel.guildId, member)
                     setTag(context, tag, 
-                        if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                        if ((settings.getBool("MoreTags_BotOnly", false) && tagStr != "") || tagStr == null) botText
                         else if (botText != "") "${botText} • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
@@ -121,7 +121,7 @@ class MoreTags : Plugin() {
 
                     val tagStr = getTag(guildId, member)
                     setTag(context, tag, 
-                        if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                        if ((settings.getBool("MoreTags_BotOnly", false) && tagStr != "") || tagStr == null) botText
                         else if (botText != "") "${botText} • ${tagStr}"
                         else tagStr ?: "",
                     member.color)
@@ -162,7 +162,7 @@ class MoreTags : Plugin() {
 
                 val tagStr = getTag(member.guildId, member)
                 setTag(context, tag, 
-                    if (settings.getBool("MoreTags_BotOnly", false || tagStr == null)) botText
+                    if (((settings.getBool("MoreTags_BotOnly", false) && tagStr != "") || tagStr == null) botText
                     else if (botText != "") "${botText} • ${tagStr}"
                     else tagStr ?: "",
                 member.color)
