@@ -1,4 +1,4 @@
-package cloudburst.plugins.notifier
+package cloudburst.plugins.notifier.ui
 
 import com.discord.app.AppBottomSheet
 import com.discord.models.guild.Guild

@@ -23,10 +23,16 @@ import com.discord.widgets.user.usersheet.WidgetUserSheet
 import com.lytefast.flexinput.fragment.FlexInputFragment
 import com.discord.widgets.guilds.profile.WidgetGuildProfileSheet
 
+import cloudburst.plugins.notifier.ui.*
+
 @AliucordPlugin
 class Notifier : Plugin() {
 
     var fragmentManager = Utils.appActivity.supportFragmentManager
+
+    init {
+        settingsTab = SettingsTab(NotifierSettings::class.java, SettingsTab.Type.BOTTOM_SHEET).withArgs(this)
+    }
 
     override fun start(context: Context) {
         with(FlexInputFragment::class.java) {  // this is only here because Utils.appActivity.supportFragmentManager is scuffed
@@ -41,14 +47,19 @@ class Notifier : Plugin() {
 
         with(StoreGuilds::class.java) {
             patcher.patch(getDeclaredMethod("handleGuildRemove", Guild::class.java), PreHook { callFrame -> try {
-                onGuildRemoval(callFrame.args[0] as Guild)
+                if (!settings.getBool("Notifier_GuildLeaves", true)) return@PreHook;
+                if (callFrame.args[0] is Guild) {
+                    onGuildRemoval(callFrame.args[0] as Guild)
+                } else {
+                    onGuildRemoval(null)
+                }
             } catch (ignored: Throwable) {
                 logger.error(ignored)
             }})
         }
         with(StoreUserRelationships::class.java) {
             patcher.patch(getDeclaredMethod("handleRelationshipRemove", ModelUserRelationship::class.java), PreHook { callFrame -> try {
-                logger.info("Relationship removed ${callFrame.args[0]}")
+                if (!settings.getBool("Notifier_FriendRemovals", true)) return@PreHook;
                 if (callFrame.args[0] is ModelUserRelationship) {
                     onUnfriend((callFrame.args[0] as ModelUserRelationship).id)
                 } else {
