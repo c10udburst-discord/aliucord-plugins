@@ -21,6 +21,7 @@ import cloudburst.plugins.editwebhooks.utils.Webhook
 import cloudburst.plugins.editwebhooks.utils.WebhookRequest
 import com.aliucord.Http
 import com.aliucord.views.Button
+import com.lytefast.flexinput.R
 
 class WebhookList(val channelRaw: Channel) : SettingsPage() {
 
@@ -35,6 +36,7 @@ class WebhookList(val channelRaw: Channel) : SettingsPage() {
 
     public fun fetchList() {
         val context = requireContext()
+        val createWebhookI18n = context.getString(R.h.create) + " webhook"
         Utils.threadPool.execute {
             val list = Http.Request.newDiscordRequest("/channels/%d/webhooks".format(channel.id))
                 .setHeader("Referer", "https://discord.com/channels/%d/%d".format(channel.guildId, channel.id))
@@ -67,10 +69,10 @@ class WebhookList(val channelRaw: Channel) : SettingsPage() {
                 addView(recyclerView)
 
                 val addButton = Button(context).apply { 
-                    text = "Create webhook"
+                    text = createWebhookI18n
                     setOnClickListener {
                         val inDialog = InputDialog()
-                                .setTitle("Create webhook")
+                                .setTitle(createWebhookI18n)
                                 .setDescription("Enter name of the webhook")
                                 .setPlaceholderText("Webhook Name")
                                 inDialog.setOnOkListener {

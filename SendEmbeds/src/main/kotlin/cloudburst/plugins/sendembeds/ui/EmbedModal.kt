@@ -167,11 +167,11 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
                     val modes = plugin.modes.toMutableList()
 
                     webhooks.keys.forEach {
-                        modes.add("webhook: %s".format(it))
+                        modes.add("Webhook: %s".format(it))
                     }
                     
                     val modeSelector = ModeSelector(modes, {mode -> 
-                        if (mode.startsWith("webhook: ")) {
+                        if (mode.startsWith("Webhook: ")) {
                             val hook = webhooks.get(mode.drop(9))
                             this.setText("webhooks/%s/%s".format(hook?.id, hook?.token))
                         } else {
@@ -187,7 +187,7 @@ class EmbedModal(val channelId: Long, val plugin: SendEmbeds, private val modeOv
         }
 
         val sendBtn = Button(context).apply { 
-            text = "Send"
+            text = context.getString(R.h.send_message)
             setOnClickListener {
                 try {
                     Utils.threadPool.execute(object : Runnable {

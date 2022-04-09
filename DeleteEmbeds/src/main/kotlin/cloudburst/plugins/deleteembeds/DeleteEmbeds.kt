@@ -30,6 +30,7 @@ class DeleteEmbeds : Plugin() {
     @SuppressLint("SetTextI18n")
     override fun start(context: Context) {
         val icon = ContextCompat.getDrawable(context, R.e.ic_clear_24dp)
+        val i18n = context.getString(R.h.delete) + " embed"
         val deleteEmbedId = View.generateViewId()
 
         with(WidgetChatListActions::class.java, {
@@ -83,7 +84,7 @@ class DeleteEmbeds : Plugin() {
                 icon?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val deleteEmbed = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                    text = "Delete Embed"
+                    text = i18n
                     id = deleteEmbedId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                     typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)

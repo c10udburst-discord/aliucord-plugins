@@ -38,6 +38,7 @@ class EditWebhooks : Plugin() {
     override fun start(context: Context) {
         val iconLeft = ContextCompat.getDrawable(context, R.e.ic_publish_24dp)
         val iconRight = ContextCompat.getDrawable(context, R.e.icon_carrot)
+        val i18n = context.getString(R.h.edit) + " webhooks"
         val editWebooksId = View.generateViewId()
 
         with(WidgetTextChannelSettings::class.java, {
@@ -73,7 +74,7 @@ class EditWebhooks : Plugin() {
                 iconRight?.setTint(ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal))
 
                 val editWebhooks = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                    text = "Edit Webhooks"
+                    text = i18n
                     id = editWebooksId
                     setCompoundDrawablesRelativeWithIntrinsicBounds(iconLeft, null, iconRight, null)
                     typeface = ResourcesCompat.getFont(ctx, Constants.Fonts.whitney_medium)

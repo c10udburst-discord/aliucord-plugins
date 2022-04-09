@@ -61,7 +61,7 @@ class WebhookMenu(
         }
         
         val deleteWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Delete"
+            text = context.getString(R.h.delete)
             setCompoundDrawablesRelativeWithIntrinsicBounds(deleteIcon, null, null, null)
             setOnClickListener {
                 val coDialog = ConfirmDialog()
@@ -80,7 +80,7 @@ class WebhookMenu(
         }
 
         val copyWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Copy url"
+            text = context.getString(R.h.copy_link)
             setCompoundDrawablesRelativeWithIntrinsicBounds(copyIcon, null, null, null)
             setOnClickListener {
                 Utils.setClipboard("Webhook Url", webhook.url)
@@ -92,7 +92,7 @@ class WebhookMenu(
         }
 
         val sendEmbed = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Send embed"
+            text = context.getString(R.h.send_message)
             setCompoundDrawablesRelativeWithIntrinsicBounds(sendEmbedIcon, null, null, null)
             setOnClickListener {
                 if (sendEmbeds != null) {
@@ -117,7 +117,7 @@ class WebhookMenu(
         }
 
         val renameWebhook = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Rename"
+            text = context.getString(R.h.change_nickname)
             setCompoundDrawablesRelativeWithIntrinsicBounds(renameIcon, null, null, null)
             setOnClickListener {
                 val inDialog = InputDialog()
@@ -137,7 +137,7 @@ class WebhookMenu(
         }
 
         val setAvatar = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Change avatar"
+            text = context.getString(R.h.change_avatar)
             setCompoundDrawablesRelativeWithIntrinsicBounds(changeAvatarIcon, null, null, null)
             setOnClickListener {
                 val inDialog = InputDialog()
@@ -157,7 +157,7 @@ class WebhookMenu(
         }
 
         val showGuild = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "Show source guild"
+            text = context.getString(R.h.this_server)
             setCompoundDrawablesRelativeWithIntrinsicBounds(guildIcon, null, null, null)
             setOnClickListener {
                 if (webhook.source_guild != null && webhook.source_channel != null) {
