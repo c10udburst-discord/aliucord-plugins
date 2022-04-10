@@ -107,7 +107,7 @@ class WebhookMenu(
         }
 
         val viewAvatar = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-            text = "View avatar"
+            text = context.getString(R.h.user_settings_avatar)
             setCompoundDrawablesRelativeWithIntrinsicBounds(avatarIcon, null, null, null)
             setOnClickListener {
                 viewAvatar()

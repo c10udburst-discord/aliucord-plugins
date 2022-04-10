@@ -114,6 +114,37 @@ class MoreTagsSettings(private val plugin: MoreTags) : SettingsPage() {
 
         addView(Divider(ctx))
 
+        addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Show in chat", "Show tags in chat.").apply {
+            val key = "MoreTags_ShowChat"
+            isChecked = plugin.settings.getBool(key, true)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
+        addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Show in member list", "Show tags in member list.").apply {
+            val key = "MoreTags_ShowList"
+            isChecked = plugin.settings.getBool(key, true)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
+        addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Show in user pane", "Show tags in user details pane.").apply {
+            val key = "MoreTags_ShowUser"
+            isChecked = plugin.settings.getBool(key, true)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
+        addView(Utils.createCheckedSetting(ctx, CheckedSetting.ViewType.SWITCH, "Show in VC", "Show tags in voice chat list.").apply {
+            val key = "MoreTags_ShowVC"
+            isChecked = plugin.settings.getBool(key, true)
+            setOnCheckedListener {
+                plugin.settings.setBool(key, it)
+            }
+        })
+
+        addView(Divider(ctx))
+
         addView(TextView(ctx, null, 0, R.i.UiKit_TextView).apply { 
             text = MDUtils.render("""
             

@@ -50,7 +50,8 @@ class MoreTags : Plugin() {
         with(WidgetChatListAdapterItemMessage::class.java) { // in chat
             val tagField = getDeclaredField("itemTag").apply { isAccessible = true; }
             patcher.patch(getDeclaredMethod("configureItemTag", Message::class.java), Hook { callFrame -> try {
-                
+                if (!settings.getBool("MoreTags_ShowChat", true)) return@Hook
+
                 val tag = tagField.get(callFrame.thisObject) as TextView?
                 if (tag == null) return@Hook
 
@@ -102,6 +103,8 @@ class MoreTags : Plugin() {
         with(ChannelMembersListViewHolderMember::class.java) { // in member list
             val bindingField = getDeclaredField("binding").apply { isAccessible = true; }
             patcher.patch(getDeclaredMethod("bind", ChannelMembersListAdapter.Item.Member::class.java, Function0::class.java), Hook { callFrame -> try {
+                if (!settings.getBool("MoreTags_ShowList", true)) return@Hook
+
                 val layout = (bindingField.get(callFrame.thisObject) as WidgetChannelMembersListItemUserBinding).root
                 val user = callFrame.args[0] as ChannelMembersListAdapter.Item.Member
                 val tag = layout.findViewById(Utils.getResId("username_tag", "id")) as TextView
@@ -136,7 +139,8 @@ class MoreTags : Plugin() {
         with(UserProfileHeaderView::class.java) {
             val bindingField = getDeclaredField("binding").apply { isAccessible = true; }
             patcher.patch(getDeclaredMethod("updateViewState", UserProfileHeaderViewModel.ViewState.Loaded::class.java), Hook { callFrame -> try {
-                
+                if (!settings.getBool("MoreTags_ShowUser", true)) return@Hook
+
                 val layout = (bindingField.get(callFrame.thisObject) as UserProfileHeaderViewBinding).a
                 val state = callFrame.args[0] as UserProfileHeaderViewModel.ViewState.Loaded
                 val member = state.guildMember
@@ -178,12 +182,13 @@ class MoreTags : Plugin() {
         with(WidgetChannelsListAdapter.ItemVoiceUser::class.java) { // vc
             val bindingField = getDeclaredField("binding").apply { isAccessible = true; }
             patcher.patch(getDeclaredMethod("onConfigure", Int::class.java, ChannelListItem::class.java), Hook { callFrame -> try {
+                if (!settings.getBool("MoreTags_ShowVC", true)) return@Hook
+
                 val tag = (bindingField.get(callFrame.thisObject) as WidgetChannelsListItemVoiceUserBinding).e
                 val channelListItemVoiceUser = callFrame.args[1] as ChannelListItemVoiceUser
                 val member = channelListItemVoiceUser.computed
                 val user = channelListItemVoiceUser.user
-
-                tag.visibility = View.GONE
+                
                 if (member == null) {
                     setTag(context, tag, 
                         if (user.discriminator == 0 && settings.getBool("MoreTags_System", true) && (user.isSystemUser() || user.id == -1L))
@@ -281,7 +286,7 @@ class MoreTags : Plugin() {
             if (rawRole == null) continue
             val role = GuildRoleWrapper(rawRole)
             val perms = role.permissions
-            val name = if (roleName) role.name.toUpperCase() else ""
+            val name = if (roleName) role.name.uppercase() else ""
             if (checkAdmin && PermissionUtils.can(Permission.ADMINISTRATOR, perms)) {
                 isAdmin = if (roleName) name else "ADMIN"
                 break
@@ -324,7 +329,7 @@ class MoreTags : Plugin() {
             val role = roleList.get(member.hoistRoleId) ?: 
                 if (member.roles.get(0) != null) roleList.get(member.roles.get(0)) else null
             if (role != null) {
-                val name = GuildRoleWrapper(role).name.toUpperCase()
+                val name = GuildRoleWrapper(role).name.uppercase()
                 if (useCache) cache[Pair(guildId, member.userId)] = name
                 return name
             }
