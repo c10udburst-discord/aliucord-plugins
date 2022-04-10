@@ -230,7 +230,7 @@ class WebhookMenu(
     }
 
     private fun setAvatar(bytes: ByteArray, type: String) {
-        var dataType = type.lowercase()
+        var dataType = type.toLowerCase()
         if (dataType == "jpg") dataType = "jpeg"
         val datauri = "data:image/%s;base64,%s".format(dataType, Base64.getEncoder().encodeToString(bytes))
         Http.Request.newDiscordRequest("/webhooks/%s".format(webhook.id), "PATCH")

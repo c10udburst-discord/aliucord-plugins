@@ -252,7 +252,8 @@ class MoreTags : Plugin() {
         val checkMod = settings.getBool("MoreTags_Mod", true)
         val checkVoiceMod = settings.getBool("MoreTags_VoiceMod", true)
         val roleName = settings.getBool("MoreTags_RoleName", false)
-        if (!(checkOwner || checkAdmin || checkStaff || checkMod || checkVoiceMod)) return null
+        val allRoles = settings.getBool("MoreTags_AllRoles", false)
+        if (!(checkOwner || checkAdmin || checkStaff || checkMod || checkVoiceMod || allRoles)) return null
 
         val guild = StoreStream.getGuilds().getGuild(guildId)
         if (guild == null) {
@@ -280,7 +281,7 @@ class MoreTags : Plugin() {
             if (rawRole == null) continue
             val role = GuildRoleWrapper(rawRole)
             val perms = role.permissions
-            val name = if (roleName) role.name.uppercase() else ""
+            val name = if (roleName) role.name.toUpperCase() else ""
             if (checkAdmin && PermissionUtils.can(Permission.ADMINISTRATOR, perms)) {
                 isAdmin = if (roleName) name else "ADMIN"
                 break
@@ -300,7 +301,6 @@ class MoreTags : Plugin() {
                 PermissionUtils.can(Permission.DEAFEN_MEMBERS, perms)) {
                 isVoiceMod = if (roleName) name else "VOICE MOD"
             }
-            
         }
         
         if (checkAdmin && isAdmin != "") {
@@ -318,6 +318,16 @@ class MoreTags : Plugin() {
         else if (checkVoiceMod && isVoiceMod != "") {
             if (useCache) cache[Pair(guildId, member.userId)] = isVoiceMod
             return isVoiceMod
+        }
+
+        if (allRoles) {
+            val role = roleList.get(member.hoistRoleId) ?: 
+                if (member.roles.get(0) != null) roleList.get(member.roles.get(0)) else null
+            if (role != null) {
+                val name = GuildRoleWrapper(role).name.toUpperCase()
+                if (useCache) cache[Pair(guildId, member.userId)] = name
+                return name
+            }
         }
 
         if (useCache) cache[Pair(guildId, member.userId)] = null
