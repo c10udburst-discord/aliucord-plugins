@@ -46,6 +46,7 @@ class TextReplace : Plugin() {
 
         with(com.discord.api.message.Message::class.java) {
             patcher.patch(getDeclaredMethod("i"), Hook { callFrame -> try {
+                if (callFrame.result == null) return@Hook
                 var content = callFrame.result as String
                 if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
@@ -82,6 +83,7 @@ class TextReplace : Plugin() {
 
         with(com.discord.api.message.embed.MessageEmbed::class.java) {
             patcher.patch(getDeclaredMethod("j"), Hook { callFrame -> try {
+                if (callFrame.result == null) return@Hook
                 var content = callFrame.result as String
                 if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
@@ -96,6 +98,7 @@ class TextReplace : Plugin() {
             }})
 
             patcher.patch(getDeclaredMethod("c"), Hook { callFrame -> try {
+                if (callFrame.result == null) return@Hook
                 var content = callFrame.result as String
                 if (content == "") return@Hook
                 for (rule in TextReplace.replacementRules) {
