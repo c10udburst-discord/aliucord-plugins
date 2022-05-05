@@ -332,7 +332,7 @@ class MoreTags : Plugin() {
 
         if (allRoles) {
             val role = roleList.get(member.hoistRoleId) ?: 
-                if (member.roles.get(0) != null) roleList.get(member.roles.get(0)) else null
+                if (member.roles.size > 0) roleList.get(member.roles.get(0)) else null
             if (role != null) {
                 val name = GuildRoleWrapper(role).name.uppercase()
                 if (useCache) cache[Pair(guildId, member.userId)] = name
