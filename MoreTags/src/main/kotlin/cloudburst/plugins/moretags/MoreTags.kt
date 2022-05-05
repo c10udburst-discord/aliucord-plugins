@@ -49,7 +49,7 @@ class MoreTags : Plugin() {
     override fun start(context: Context) {
         with(WidgetChatListAdapterItemMessage::class.java) { // in chat
             val tagField = getDeclaredField("itemTag").apply { isAccessible = true; }
-            patcher.patch(getDeclaredMethod("configureItemTag", Message::class.java), Hook { callFrame -> try {
+            patcher.patch(getDeclaredMethod("configureItemTag", Message::class.java, Boolean::class.javaPrimitiveType), Hook { callFrame -> try {
                 if (!settings.getBool("MoreTags_ShowChat", true)) return@Hook
 
                 val tag = tagField.get(callFrame.thisObject) as TextView?
@@ -58,6 +58,7 @@ class MoreTags : Plugin() {
                 tag.visibility = View.GONE
 
                 val msg = callFrame.args[0] as Message
+                val isOP = callFrame.args[1] as Boolean
                 val user = CoreUser(msg.author)
 
                 if (user.discriminator == 0) {
@@ -68,6 +69,8 @@ class MoreTags : Plugin() {
                             "SYSTEM"
                         else if (user.isBot())
                             "BOT"
+                        else if (isOP)
+                            "OP"
                         else
                             ""
                     , null)
@@ -78,6 +81,8 @@ class MoreTags : Plugin() {
                     "SYSTEM"
                 else if (user.isBot())
                     "BOT"
+                else if (isOP)
+                    "OP"
                 else
                     ""
 
