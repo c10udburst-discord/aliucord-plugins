@@ -1,4 +1,4 @@
-# Plugins for [Aliucord](https://github.com/Aliucord) Legacy
+# Plugins for Aliucord Legacy
 
 ### Outdated
 _Discord is completely redoing Android client, therefore these plugins won't work for the new React Native version. You can check out my plugins for the new version [right here](https://github.com/c10udburst-discord/Aliucord-RightNow-Plugins#readme)._
