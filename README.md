@@ -1,4 +1,7 @@
-## Plugins for [Aliucord](https://github.com/Aliucord)
+# Plugins for [Aliucord](https://github.com/Aliucord) Legacy
+
+### Outdated
+_Discord is completely redoing Android client, therefore these plugins won't work for the new React Native version. You can check out my plugins for the new version [right here](https://github.com/c10udburst-discord/Aliucord-RightNow-Plugins#readme)._
 
 Click on a plugin name to download, and then move the downloaded file to the `Aliucord/plugins` folder
 - [DeleteEmbeds](https://github.com/c10udburst-discord/aliucord-plugins/raw/builds/DeleteEmbeds.zip) | 
