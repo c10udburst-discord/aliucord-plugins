@@ -12,7 +12,7 @@ data class TextReplacement(
             if (isRegex) {
                 return fromInput.toRegex().containsMatchIn(message)
             } else {
-                return message.contains(fromInput)
+                return message.contains(fromInput, ignoreCase = ignoreCase)
             }
         }
 
